@@ -8,7 +8,7 @@ namespace SuperEsperanzaApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // 1. Esto protege TODOS los métodos de la clase por defecto
+    [Authorize] // 1. Esto protege TODOS los mï¿½todos de la clase por defecto
     public class RolController : ControllerBase
     {
         private readonly IRolService _rolService;
@@ -16,7 +16,7 @@ namespace SuperEsperanzaApi.Controllers
         public RolController(IRolService rolService) => _rolService = rolService;
 
         [HttpGet]
-        // [AllowAnonymous] <--- 2. AL BORRAR ESTA LÍNEA, AHORA EXIGE TOKEN
+        // [AllowAnonymous] <--- 2. AL BORRAR ESTA Lï¿½NEA, AHORA EXIGE TOKEN
         public async Task<IActionResult> GetAll() => Ok(await _rolService.ListarRolesAsync());
 
         [HttpGet("{id:int}")]
@@ -27,7 +27,7 @@ namespace SuperEsperanzaApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Este exige token Y ADEMÁS ser Admin
+        [Authorize(Roles = "Administrador")] // Este exige token Y ADEMï¿½S ser Admin
         public async Task<IActionResult> Create([FromBody] Rol input)
         {
             if (string.IsNullOrWhiteSpace(input.NombreRol)) return BadRequest("NombreRol es requerido.");
@@ -40,7 +40,7 @@ namespace SuperEsperanzaApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Update(int id, [FromBody] Rol input)
         {
             if (string.IsNullOrWhiteSpace(input.NombreRol)) return BadRequest("NombreRol es requerido.");
@@ -53,7 +53,7 @@ namespace SuperEsperanzaApi.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "Admin")] // Probablemente quieras proteger borrar también
+        [Authorize(Roles = "Administrador")] // Probablemente quieras proteger borrar tambiï¿½n
         public async Task<IActionResult> Delete(int id)
         {
             var ok = await _rolService.EliminarRolAsync(id);
@@ -61,7 +61,7 @@ namespace SuperEsperanzaApi.Controllers
             return NoContent();
         }
 
-        // Método Helper para extraer el ID del usuario del Token JWT
+        // Mï¿½todo Helper para extraer el ID del usuario del Token JWT
         private int GetUserIdFromClaims()
         {
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);

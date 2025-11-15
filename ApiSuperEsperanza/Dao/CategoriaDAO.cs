@@ -88,6 +88,11 @@ namespace SuperEsperanzaApi.Dao
                 categoria.FechaCreacion = reader["FechaCreacion"] is DBNull ? DateTime.MinValue : Convert.ToDateTime(reader["FechaCreacion"]);
             }
 
+            if (HasColumn(reader, "FechaModificacion"))
+            {
+                // Categoria no tiene FechaModificacion en el modelo, pero el SP puede devolverla
+            }
+
             if (HasColumn(reader, "Id_UsuarioCreacion"))
             {
                 categoria.Id_UsuarioCreacion = reader["Id_UsuarioCreacion"] is DBNull ? 0 : Convert.ToInt32(reader["Id_UsuarioCreacion"]);

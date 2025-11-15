@@ -13,7 +13,12 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    // Agregar el filtro de autorización personalizado globalmente
+    options.Filters.Add<SuperEsperanzaApi.Filters.AuthorizationErrorHandler>();
+})
+.AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.TypeInfoResolverChain.Add(AppJsonSerializerContext.Default);
 });
@@ -57,10 +62,25 @@ builder.Services.AddSingleton<ConexionDB>();
 builder.Services.AddScoped<UsuarioDAO>();
 builder.Services.AddScoped<RolDAO>();
 builder.Services.AddScoped<CategoriaDAO>();
+builder.Services.AddScoped<ProductoDAO>();
+builder.Services.AddScoped<ProveedorDAO>();
+builder.Services.AddScoped<ClienteDAO>();
+builder.Services.AddScoped<CompraDAO>();
+builder.Services.AddScoped<LoteDAO>();
+builder.Services.AddScoped<SesionDAO>();
+builder.Services.AddScoped<FacturaDAO>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IUsuarioCrudService, UsuarioCrudService>();
 builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IService<Categoria>, CategoriaService>();
+builder.Services.AddScoped<IService<Producto>, ProductoService>();
+builder.Services.AddScoped<IService<Proveedor>, ProveedorService>();
+builder.Services.AddScoped<IService<Cliente>, ClienteService>();
+builder.Services.AddScoped<ICompraService, CompraService>();
+builder.Services.AddScoped<ILoteService, LoteService>();
+builder.Services.AddScoped<ISesionService, SesionService>();
+builder.Services.AddScoped<IFacturaService, FacturaService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
@@ -110,6 +130,9 @@ app.UseSwaggerUI(c =>
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Agregar middleware para manejar errores de autorización
+app.UseMiddleware<SuperEsperanzaApi.Middleware.AuthorizationErrorHandlerMiddleware>();
 
 app.MapControllers();
 

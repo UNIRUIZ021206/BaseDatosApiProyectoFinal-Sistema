@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization; // <--- ESTA ES LA LÍNEA CRÍTICA QUE FALTABA
+using System.Text.Json.Serialization; // <--- ESTA ES LA Lï¿½NEA CRï¿½TICA QUE FALTABA
 using Microsoft.AspNetCore.Mvc;       // <--- Necesario para ProblemDetails
 using SuperEsperanzaApi.Dto;
 using SuperEsperanzaApi.Models;
@@ -8,26 +8,28 @@ namespace SuperEsperanzaApi
 {
     [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
     
-    // --- Autenticación y General ---
+    // --- Autenticaciï¿½n y General ---
     [JsonSerializable(typeof(LoginRequest))]
     [JsonSerializable(typeof(LoginResponse))]
     [JsonSerializable(typeof(ApiStatusResponse))]
     [JsonSerializable(typeof(ErrorResponse))]
+    [JsonSerializable(typeof(ErrorDetailResponse))]
     [JsonSerializable(typeof(MensajeResponse))]
+    [JsonSerializable(typeof(AuthorizationErrorResponse))]
     [JsonSerializable(typeof(Usuario))]
-    [JsonSerializable(typeof(Rol))]                  // <-- Añadido: metadata para Rol
-    [JsonSerializable(typeof(IEnumerable<Rol>))]     // <-- Añadido: colecciones de Rol
+    [JsonSerializable(typeof(Rol))]                  // <-- Aï¿½adido: metadata para Rol
+    [JsonSerializable(typeof(IEnumerable<Rol>))]     // <-- Aï¿½adido: colecciones de Rol
     [JsonSerializable(typeof(List<Rol>))]
     [JsonSerializable(typeof(Rol[]))]
 
-    // --- Errores Estándar de ASP.NET Core ---
+    // --- Errores Estï¿½ndar de ASP.NET Core ---
     [JsonSerializable(typeof(ProblemDetails))]
     [JsonSerializable(typeof(ValidationProblemDetails))]
     [JsonSerializable(typeof(Dictionary<string, string[]>))]
 
     // ... otros registros ...
 
-    // --- MÓDULO CATEGORIA ---
+    // --- Mï¿½DULO CATEGORIA ---
     [JsonSerializable(typeof(Categoria))]
     [JsonSerializable(typeof(IEnumerable<Categoria>))]
     [JsonSerializable(typeof(List<Categoria>))]
@@ -38,6 +40,90 @@ namespace SuperEsperanzaApi
 
     [JsonSerializable(typeof(CategoriaCreateDto))]
     [JsonSerializable(typeof(CategoriaUpdateDto))]
+
+    // --- MÃ“DULO PRODUCTO ---
+    [JsonSerializable(typeof(Producto))]
+    [JsonSerializable(typeof(IEnumerable<Producto>))]
+    [JsonSerializable(typeof(List<Producto>))]
+    [JsonSerializable(typeof(ProductoDto))]
+    [JsonSerializable(typeof(IEnumerable<ProductoDto>))]
+    [JsonSerializable(typeof(List<ProductoDto>))]
+    [JsonSerializable(typeof(ProductoCreateDto))]
+    [JsonSerializable(typeof(ProductoUpdateDto))]
+
+    // --- MÃ“DULO PROVEEDOR ---
+    [JsonSerializable(typeof(Proveedor))]
+    [JsonSerializable(typeof(IEnumerable<Proveedor>))]
+    [JsonSerializable(typeof(List<Proveedor>))]
+    [JsonSerializable(typeof(ProveedorDto))]
+    [JsonSerializable(typeof(IEnumerable<ProveedorDto>))]
+    [JsonSerializable(typeof(List<ProveedorDto>))]
+    [JsonSerializable(typeof(ProveedorCreateDto))]
+    [JsonSerializable(typeof(ProveedorUpdateDto))]
+
+    // --- MÃ“DULO CLIENTE ---
+    [JsonSerializable(typeof(Cliente))]
+    [JsonSerializable(typeof(IEnumerable<Cliente>))]
+    [JsonSerializable(typeof(List<Cliente>))]
+    [JsonSerializable(typeof(ClienteDto))]
+    [JsonSerializable(typeof(IEnumerable<ClienteDto>))]
+    [JsonSerializable(typeof(List<ClienteDto>))]
+    [JsonSerializable(typeof(ClienteCreateDto))]
+    [JsonSerializable(typeof(ClienteUpdateDto))]
+
+    // --- MÃ“DULO USUARIO (CRUD) ---
+    [JsonSerializable(typeof(IEnumerable<Usuario>))]
+    [JsonSerializable(typeof(List<Usuario>))]
+    [JsonSerializable(typeof(UsuarioDto))]
+    [JsonSerializable(typeof(IEnumerable<UsuarioDto>))]
+    [JsonSerializable(typeof(List<UsuarioDto>))]
+    [JsonSerializable(typeof(UsuarioCreateDto))]
+    [JsonSerializable(typeof(UsuarioUpdateDto))]
+
+    // --- MÃ“DULO COMPRA ---
+    [JsonSerializable(typeof(Compra))]
+    [JsonSerializable(typeof(IEnumerable<Compra>))]
+    [JsonSerializable(typeof(List<Compra>))]
+    [JsonSerializable(typeof(CompraDto))]
+    [JsonSerializable(typeof(IEnumerable<CompraDto>))]
+    [JsonSerializable(typeof(List<CompraDto>))]
+    [JsonSerializable(typeof(CompraCreateDto))]
+    [JsonSerializable(typeof(DetalleCompra))]
+    [JsonSerializable(typeof(DetalleCompraDto))]
+    [JsonSerializable(typeof(DetalleCompraCreateDto))]
+    [JsonSerializable(typeof(DetalleCompraUpdateDto))]
+
+    // --- MÃ“DULO LOTE ---
+    [JsonSerializable(typeof(Lote))]
+    [JsonSerializable(typeof(IEnumerable<Lote>))]
+    [JsonSerializable(typeof(List<Lote>))]
+    [JsonSerializable(typeof(LoteDto))]
+    [JsonSerializable(typeof(IEnumerable<LoteDto>))]
+    [JsonSerializable(typeof(List<LoteDto>))]
+    [JsonSerializable(typeof(LoteCreateDto))]
+
+    // --- MÃ“DULO SESION ---
+    [JsonSerializable(typeof(Sesion))]
+    [JsonSerializable(typeof(IEnumerable<Sesion>))]
+    [JsonSerializable(typeof(List<Sesion>))]
+    [JsonSerializable(typeof(SesionDto))]
+    [JsonSerializable(typeof(IEnumerable<SesionDto>))]
+    [JsonSerializable(typeof(List<SesionDto>))]
+    [JsonSerializable(typeof(SesionCreateDto))]
+    [JsonSerializable(typeof(SesionCerrarDto))]
+
+    // --- MÃ“DULO FACTURA ---
+    [JsonSerializable(typeof(Factura))]
+    [JsonSerializable(typeof(IEnumerable<Factura>))]
+    [JsonSerializable(typeof(List<Factura>))]
+    [JsonSerializable(typeof(FacturaDto))]
+    [JsonSerializable(typeof(IEnumerable<FacturaDto>))]
+    [JsonSerializable(typeof(List<FacturaDto>))]
+    [JsonSerializable(typeof(FacturaCreateDto))]
+    [JsonSerializable(typeof(DetalleFactura))]
+    [JsonSerializable(typeof(DetalleFacturaDto))]
+    [JsonSerializable(typeof(DetalleFacturaCreateDto))]
+    [JsonSerializable(typeof(FacturaAnularDto))]
 
     internal partial class AppJsonSerializerContext : JsonSerializerContext
     {
