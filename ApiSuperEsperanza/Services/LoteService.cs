@@ -8,6 +8,7 @@ namespace SuperEsperanzaApi.Services
         Task<Lote?> ObtenerLotePorIdAsync(int idLote);
         Task<(bool ok, string error, int? idLote)> CrearLoteAsync(Lote lote);
         Task<IEnumerable<Lote>> ListarLotesPorProductoAsync(int idProducto);
+        Task<(bool ok, string error)> MarcarLotesVencidosAsync();
     }
 
     public class LoteService : ILoteService
@@ -40,6 +41,19 @@ namespace SuperEsperanzaApi.Services
         public async Task<IEnumerable<Lote>> ListarLotesPorProductoAsync(int idProducto)
         {
             return await _loteDAO.ListarLotesPorProductoAsync(idProducto);
+        }
+
+        public async Task<(bool ok, string error)> MarcarLotesVencidosAsync()
+        {
+            try
+            {
+                await _loteDAO.MarcarLotesVencidosAsync();
+                return (true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
         }
     }
 }

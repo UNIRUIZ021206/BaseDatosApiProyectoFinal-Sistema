@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Nuevo perfil",
+    "Projects": [
+      {
+        "Path": "ApiSuperEsperanza\\ApiSuperEsperanza.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SuperEsperanzaFrontEnd\\SuperEsperanzaFrontEnd.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

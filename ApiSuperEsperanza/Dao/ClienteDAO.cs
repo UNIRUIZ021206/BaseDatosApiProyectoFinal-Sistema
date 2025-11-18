@@ -29,7 +29,11 @@ namespace SuperEsperanzaApi.Dao
             using var cmd = new SqlCommand(Procedimientos.SP_OBTENER_CLIENTE_POR_ID, cn) { CommandType = CommandType.StoredProcedure };
             cmd.Parameters.AddWithValue("@Id_Cliente", id);
             using var reader = await cmd.ExecuteReaderAsync();
-            return await reader.ReadAsync() ? MapReader(reader) : null;
+            if (await reader.ReadAsync())
+            {
+                return MapReader(reader);
+            }
+            return null;
         }
 
         public override async Task<int> CreateAsync(Cliente entity)
@@ -47,8 +51,8 @@ namespace SuperEsperanzaApi.Dao
             cmd.Parameters.AddWithValue("@TipoMembresia", (object?)entity.TipoMembresia ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Id_UsuarioCreacion", entity.Id_UsuarioCreacion);
 
-            var res = await cmd.ExecuteScalarAsync();
-            return res != null ? Convert.ToInt32(res) : 0;
+            var result = await cmd.ExecuteScalarAsync();
+            return Convert.ToInt32(result);
         }
 
         public override async Task<bool> UpdateAsync(Cliente entity)
@@ -66,21 +70,42 @@ namespace SuperEsperanzaApi.Dao
             cmd.Parameters.AddWithValue("@Email", (object?)entity.Email ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@TipoMembresia", (object?)entity.TipoMembresia ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@Estado", entity.Estado);
-            cmd.Parameters.AddWithValue("@Id_UsuarioModificacion", entity.Id_UsuarioModificacion);
+            cmd.Parameters.AddWithValue("@Id_UsuarioModificacion", entity.Id_UsuarioModificacion ?? 0);
 
             var res = await cmd.ExecuteScalarAsync();
             return res != null;
         }
 
-        public override async Task<bool> DeleteAsync(int id, int idUsuarioModificacion)
+        public override async Task<bool> DeleteAsync(int id, int userId)
         {
             using var cn = await GetOpenConnectionAsync();
             using var cmd = new SqlCommand(Procedimientos.SP_ELIMINAR_CLIENTE, cn) { CommandType = CommandType.StoredProcedure };
             cmd.Parameters.AddWithValue("@Id_Cliente", id);
-            cmd.Parameters.AddWithValue("@Id_UsuarioModificacion", idUsuarioModificacion);
+            cmd.Parameters.AddWithValue("@Id_UsuarioModificacion", userId);
 
             var res = await cmd.ExecuteScalarAsync();
             return res != null;
+        }
+
+        /// <summary>
+        /// Asigna puntos a un cliente después de una compra usando el procedimiento almacenado
+        /// </summary>
+        public async Task<(int puntosGanados, string tipoMembresia)> AsignarPuntosClienteAsync(int idCliente, decimal montoTotalCompra, int idUsuarioOperacion)
+        {
+            using var cn = await GetOpenConnectionAsync();
+            using var cmd = new SqlCommand(Procedimientos.SP_ASIGNAR_PUNTOS_CLIENTE, cn) { CommandType = CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@Id_Cliente", idCliente);
+            cmd.Parameters.AddWithValue("@MontoTotalCompra", montoTotalCompra);
+            cmd.Parameters.AddWithValue("@Id_UsuarioOperacion", idUsuarioOperacion);
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var puntosGanados = reader["PuntosGanadosEnEstaCompra"] is DBNull ? 0 : Convert.ToInt32(reader["PuntosGanadosEnEstaCompra"]);
+                var tipoMembresia = reader["Membresia"] is DBNull ? null : reader["Membresia"].ToString();
+                return (puntosGanados, tipoMembresia ?? string.Empty);
+            }
+            return (0, string.Empty);
         }
 
         private Cliente MapReader(SqlDataReader reader)
@@ -125,12 +150,7 @@ namespace SuperEsperanzaApi.Dao
 
             if (HasColumn(reader, "UltimaCompra"))
             {
-                cliente.UltimaCompra = reader["UltimaCompra"] is DBNull ? null : (DateTime?)Convert.ToDateTime(reader["UltimaCompra"]);
-            }
-
-            if (HasColumn(reader, "FechaModificacion"))
-            {
-                cliente.FechaModificacion = reader["FechaModificacion"] is DBNull ? null : (DateTime?)Convert.ToDateTime(reader["FechaModificacion"]);
+                cliente.UltimaCompra = reader["UltimaCompra"] is DBNull ? null : Convert.ToDateTime(reader["UltimaCompra"]);
             }
 
             if (HasColumn(reader, "Id_UsuarioCreacion"))
@@ -141,6 +161,11 @@ namespace SuperEsperanzaApi.Dao
             if (HasColumn(reader, "Id_UsuarioModificacion"))
             {
                 cliente.Id_UsuarioModificacion = reader["Id_UsuarioModificacion"] is DBNull ? null : Convert.ToInt32(reader["Id_UsuarioModificacion"]);
+            }
+
+            if (HasColumn(reader, "FechaModificacion"))
+            {
+                cliente.FechaModificacion = reader["FechaModificacion"] is DBNull ? null : Convert.ToDateTime(reader["FechaModificacion"]);
             }
 
             return cliente;
@@ -157,4 +182,3 @@ namespace SuperEsperanzaApi.Dao
         }
     }
 }
-

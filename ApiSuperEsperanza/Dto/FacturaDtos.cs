@@ -5,7 +5,8 @@ namespace SuperEsperanzaApi.Dto
     public class FacturaCreateDto
     {
         [Required] public string CodigoFactura { get; set; } = string.Empty;
-        [Required] public int Id_Cliente { get; set; }
+        // Id_Cliente puede ser null para cliente general, por lo que no usamos [Required]
+        public int? Id_Cliente { get; set; }
         [Required] public int Id_Sesion { get; set; }
         [Required] public string NumeroFactura { get; set; } = string.Empty;
         [Required] public decimal Subtotal { get; set; }
@@ -25,7 +26,7 @@ namespace SuperEsperanzaApi.Dto
     {
         public int Id_Factura { get; set; }
         public string CodigoFactura { get; set; } = string.Empty;
-        public int Id_Cliente { get; set; }
+        public int? Id_Cliente { get; set; }
         public string? ClienteNombre { get; set; }
         public int Id_Sesion { get; set; }
         public string? CodigoSesion { get; set; }

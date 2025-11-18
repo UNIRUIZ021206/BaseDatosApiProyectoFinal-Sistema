@@ -21,6 +21,8 @@ builder.Services.AddControllers(options =>
 .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.TypeInfoResolverChain.Add(AppJsonSerializerContext.Default);
+    // Configurar formato de fecha para evitar problemas con SQL Server
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -67,6 +69,7 @@ builder.Services.AddScoped<ProveedorDAO>();
 builder.Services.AddScoped<ClienteDAO>();
 builder.Services.AddScoped<CompraDAO>();
 builder.Services.AddScoped<LoteDAO>();
+builder.Services.AddScoped<ReporteDAO>();
 builder.Services.AddScoped<SesionDAO>();
 builder.Services.AddScoped<FacturaDAO>();
 builder.Services.AddScoped<JwtService>();
@@ -81,6 +84,7 @@ builder.Services.AddScoped<ICompraService, CompraService>();
 builder.Services.AddScoped<ILoteService, LoteService>();
 builder.Services.AddScoped<ISesionService, SesionService>();
 builder.Services.AddScoped<IFacturaService, FacturaService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);

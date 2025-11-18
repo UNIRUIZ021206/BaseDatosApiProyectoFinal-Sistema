@@ -14,30 +14,13 @@ namespace SuperEsperanzaApi.Dao
             _conexion = conexion;
         }
 
-        public async Task<int> InsertarLoteAsync(Lote lote)
-        {
-            using var cn = await GetOpenConnectionAsync();
-            using var cmd = new SqlCommand(Procedimientos.SP_INSERTAR_LOTE, cn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmd.Parameters.AddWithValue("@CodigoLote", lote.CodigoLote);
-            cmd.Parameters.AddWithValue("@Id_Producto", lote.Id_Producto);
-            cmd.Parameters.AddWithValue("@Id_Compra", lote.Id_Compra);
-            cmd.Parameters.AddWithValue("@Cantidad", lote.Cantidad);
-            cmd.Parameters.AddWithValue("@FechaVencimiento", (object?)lote.FechaVencimiento ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@Id_UsuarioCreacion", lote.Id_UsuarioCreacion);
-
-            var result = await cmd.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
-        }
-
         public async Task<Lote?> ObtenerLotePorIdAsync(int idLote)
         {
             using var cn = await GetOpenConnectionAsync();
-            // Nota: Si existe el SP sp_ObtenerLotePorId, usarlo. Si no, usar SELECT directo
-            // Por ahora usamos SELECT directo ya que el SP no fue proporcionado en los scripts
-            using var cmd = new SqlCommand("SELECT * FROM Lote WHERE Id_Lote = @Id_Lote", cn);
+            using var cmd = new SqlCommand(Procedimientos.SP_OBTENER_LOTE_POR_ID, cn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
             cmd.Parameters.AddWithValue("@Id_Lote", idLote);
 
             using var reader = await cmd.ExecuteReaderAsync();
@@ -60,6 +43,46 @@ namespace SuperEsperanzaApi.Dao
             return null;
         }
 
+        public async Task<int> InsertarLoteAsync(Lote lote)
+        {
+            using var cn = await GetOpenConnectionAsync();
+            using var cmd = new SqlCommand(Procedimientos.SP_INSERTAR_LOTE, cn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@CodigoLote", lote.CodigoLote);
+            cmd.Parameters.AddWithValue("@Id_Producto", lote.Id_Producto);
+            cmd.Parameters.AddWithValue("@Id_Compra", lote.Id_Compra);
+            cmd.Parameters.AddWithValue("@Cantidad", lote.Cantidad);
+            // @FechaIngreso no se pasa porque el SP usa GETDATE() automáticamente
+            cmd.Parameters.AddWithValue("@FechaVencimiento", (object?)lote.FechaVencimiento ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Id_UsuarioCreacion", lote.Id_UsuarioCreacion);
+
+            var result = await cmd.ExecuteScalarAsync();
+            return Convert.ToInt32(result);
+        }
+
+        /// <summary>
+        /// Inserta un lote dentro de una transacción existente (para uso en compras)
+        /// </summary>
+        public async Task<int> InsertarLoteAsync(Lote lote, SqlConnection cn, SqlTransaction transaction)
+        {
+            using var cmd = new SqlCommand(Procedimientos.SP_INSERTAR_LOTE, cn, transaction)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmd.Parameters.AddWithValue("@CodigoLote", lote.CodigoLote);
+            cmd.Parameters.AddWithValue("@Id_Producto", lote.Id_Producto);
+            cmd.Parameters.AddWithValue("@Id_Compra", lote.Id_Compra);
+            cmd.Parameters.AddWithValue("@Cantidad", lote.Cantidad);
+            // @FechaIngreso no se pasa porque el SP usa GETDATE() automáticamente
+            cmd.Parameters.AddWithValue("@FechaVencimiento", (object?)lote.FechaVencimiento ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Id_UsuarioCreacion", lote.Id_UsuarioCreacion);
+
+            var result = await cmd.ExecuteScalarAsync();
+            return Convert.ToInt32(result);
+        }
+
         public async Task<IEnumerable<Lote>> ListarLotesPorProductoAsync(int idProducto)
         {
             var lista = new List<Lote>();
@@ -77,15 +100,33 @@ namespace SuperEsperanzaApi.Dao
                 {
                     Id_Lote = Convert.ToInt32(reader["Id_Lote"]),
                     CodigoLote = reader["CodigoLote"].ToString() ?? "",
-                    Id_Producto = idProducto, // Ya sabemos que es este producto (viene del parámetro)
+                    Id_Producto = idProducto,
                     Cantidad = Convert.ToInt32(reader["Cantidad"]),
                     FechaIngreso = Convert.ToDateTime(reader["FechaIngreso"]),
                     FechaVencimiento = reader["FechaVencimiento"] is DBNull ? null : Convert.ToDateTime(reader["FechaVencimiento"]),
-                    Estado = true // El SP sp_ListarLotesPorProducto solo devuelve lotes con Estado = 1
-                    // Nota: El SP no devuelve Id_Compra, FechaCreacion, Id_UsuarioCreacion
+                    Estado = true
                 });
             }
             return lista;
+        }
+
+        /// <summary>
+        /// Marca los lotes vencidos como inactivos usando el procedimiento almacenado
+        /// </summary>
+        public async Task<int> MarcarLotesVencidosAsync()
+        {
+            using var cn = await GetOpenConnectionAsync();
+            using var cmd = new SqlCommand(Procedimientos.SP_MARCAR_LOTES_VENCIDOS, cn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            // El procedimiento no devuelve un valor, solo ejecuta
+            await cmd.ExecuteNonQueryAsync();
+            
+            // Devolvemos 0 ya que el procedimiento no retorna cantidad de lotes marcados
+            // Si necesitas saber cuántos se marcaron, deberías modificar el SP para que retorne ese valor
+            return 0;
         }
 
         private async Task<SqlConnection> GetOpenConnectionAsync()
@@ -96,4 +137,3 @@ namespace SuperEsperanzaApi.Dao
         }
     }
 }
-

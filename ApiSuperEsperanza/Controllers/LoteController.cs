@@ -65,6 +65,22 @@ namespace SuperEsperanzaApi.Controlador
             var dtoCreado = _mapper.Map<LoteDto>(lote);
             return CreatedAtAction(nameof(Create), new { id = lote.Id_Lote }, dtoCreado);
         }
+
+        /// <summary>
+        /// Marca los lotes vencidos como inactivos
+        /// </summary>
+        [HttpPost("marcar-vencidos")]
+        [Authorize(Roles = "Administrador,Bodeguero,Supervisor")]
+        public async Task<ActionResult> MarcarLotesVencidos()
+        {
+            var (ok, error) = await _service.MarcarLotesVencidosAsync();
+            if (!ok)
+            {
+                return BadRequest(new ErrorResponse { Error = error });
+            }
+
+            return Ok(new MensajeResponse { Mensaje = "Lotes vencidos marcados correctamente" });
+        }
     }
 }
 

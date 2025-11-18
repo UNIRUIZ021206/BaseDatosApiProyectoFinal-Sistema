@@ -25,7 +25,11 @@ namespace SuperEsperanzaApi.Controlador
         private int GetUserId()
         {
             var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-            return claim != null && int.TryParse(claim.Value, out int id) ? id : 0;
+            if (claim == null || !int.TryParse(claim.Value, out int id) || id <= 0)
+            {
+                throw new UnauthorizedAccessException("Usuario no autenticado o ID de usuario inválido.");
+            }
+            return id;
         }
 
         [HttpGet("{id}/detalles")]
@@ -41,19 +45,39 @@ namespace SuperEsperanzaApi.Controlador
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
+            // Validar que haya detalles
+            if (dto.Detalles == null || !dto.Detalles.Any())
+            {
+                return BadRequest(new ErrorResponse { Error = "La factura debe tener al menos un detalle." });
+            }
+
+            var userId = GetUserId();
+            System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Iniciando creación de factura");
+            System.Diagnostics.Debug.WriteLine($"  - Usuario ID: {userId}");
+            System.Diagnostics.Debug.WriteLine($"  - Código Factura: {dto.CodigoFactura}");
+            System.Diagnostics.Debug.WriteLine($"  - Cantidad de detalles recibidos: {dto.Detalles.Count}");
+            
+            foreach (var det in dto.Detalles)
+            {
+                System.Diagnostics.Debug.WriteLine($"    Detalle recibido: Lote ID {det.Id_Lote}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}");
+            }
+
             var factura = _mapper.Map<Factura>(dto);
-            factura.Id_UsuarioCreacion = GetUserId();
+            factura.Id_UsuarioCreacion = userId;
 
             // Mapear los detalles
-            if (dto.Detalles != null)
+            factura.Detalles = dto.Detalles.Select(d => new DetalleFactura
             {
-                factura.Detalles = dto.Detalles.Select(d => new DetalleFactura
-                {
-                    Id_Lote = d.Id_Lote,
-                    Cantidad = d.Cantidad,
-                    PrecioUnitario = d.PrecioUnitario,
-                    Id_UsuarioCreacion = GetUserId()
-                }).ToList();
+                Id_Lote = d.Id_Lote,
+                Cantidad = d.Cantidad,
+                PrecioUnitario = d.PrecioUnitario,
+                Id_UsuarioCreacion = userId
+            }).ToList();
+
+            System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Detalles mapeados: {factura.Detalles.Count}");
+            foreach (var det in factura.Detalles)
+            {
+                System.Diagnostics.Debug.WriteLine($"    Detalle mapeado: Lote ID {det.Id_Lote}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}, Usuario {det.Id_UsuarioCreacion}");
             }
 
             var (ok, error, idFactura) = await _service.CrearFacturaAsync(factura);

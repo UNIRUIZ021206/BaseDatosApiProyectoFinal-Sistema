@@ -26,39 +26,42 @@ namespace SuperEsperanzaApi.Services
         {
             try
             {
-                // Calcular subtotales en los detalles
-                if (compra.Detalles != null)
+                // Validar que haya detalles
+                if (compra.Detalles == null || !compra.Detalles.Any())
                 {
-                    foreach (var detalle in compra.Detalles)
-                    {
-                        detalle.Subtotal = detalle.Cantidad * detalle.PrecioUnitario;
-                    }
+                    return (false, "La compra debe tener al menos un detalle.", null);
                 }
 
-                // Insertar la compra con sus detalles
+                // Validar detalles antes de procesar
+                foreach (var detalle in compra.Detalles)
+                {
+                    // Validar que la cantidad sea positiva
+                    if (detalle.Cantidad <= 0)
+                    {
+                        return (false, $"La cantidad debe ser mayor a cero para el producto ID {detalle.Id_Producto}.", null);
+                    }
+
+                    // Validar que el precio sea positivo
+                    if (detalle.PrecioUnitario <= 0)
+                    {
+                        return (false, $"El precio unitario debe ser mayor a cero para el producto ID {detalle.Id_Producto}.", null);
+                    }
+
+                    // Calcular subtotal
+                    detalle.Subtotal = detalle.Cantidad * detalle.PrecioUnitario;
+                }
+
+                // Insertar la compra con sus detalles y lotes (todo dentro de una transacción en CompraDAO)
+                // Los lotes se crean automáticamente dentro de la transacción de CompraDAO
                 var idCompra = await _compraDAO.InsertarCompraAsync(compra);
                 compra.Id_Compra = idCompra;
 
-                // Crear lotes para cada detalle de compra
-                if (compra.Detalles != null)
-                {
-                    foreach (var detalle in compra.Detalles)
-                    {
-                        var lote = new Lote
-                        {
-                            CodigoLote = $"LOTE-{compra.CodigoCompra}-{detalle.Id_Producto}",
-                            Id_Producto = detalle.Id_Producto,
-                            Id_Compra = idCompra,
-                            Cantidad = detalle.Cantidad,
-                            FechaVencimiento = null, // Se puede agregar lógica para calcular esto
-                            Id_UsuarioCreacion = compra.Id_UsuarioCreacion
-                        };
-
-                        await _loteDAO.InsertarLoteAsync(lote);
-                    }
-                }
-
                 return (true, string.Empty, idCompra);
+            }
+            catch (ArgumentException ex)
+            {
+                // Capturar errores de validación
+                return (false, ex.Message, null);
             }
             catch (Exception ex)
             {
@@ -101,4 +104,3 @@ namespace SuperEsperanzaApi.Services
         }
     }
 }
-

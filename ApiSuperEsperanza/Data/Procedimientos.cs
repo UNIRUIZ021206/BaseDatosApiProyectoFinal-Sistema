@@ -68,5 +68,17 @@
         public const string SP_INSERTAR_DETALLE_FACTURA = "sp_InsertarDetalleFactura";
         public const string SP_LISTAR_DETALLES_POR_FACTURA = "sp_ListarDetallesPorFactura";
         public const string SP_ANULAR_FACTURA = "sp_AnularFactura";
+        
+        // Clientes - Puntos
+        public const string SP_ASIGNAR_PUNTOS_CLIENTE = "sp_AsignarPuntosCliente";
+        
+        // Reportes
+        public const string SP_REPORTE_VENTAS = "sp_ReporteVentas";
+        
+        // Lotes
+        public const string SP_MARCAR_LOTES_VENCIDOS = "sp_MarcarLotesVencidos";
+        
+        // Vistas
+        public const string VW_INVENTARIO_GENERAL = "vw_InventarioGeneral";
     }
 }

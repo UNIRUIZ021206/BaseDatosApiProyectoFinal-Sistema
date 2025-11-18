@@ -4,7 +4,7 @@ namespace SuperEsperanzaApi.Models
     {
         public int Id_Factura { get; set; }
         public string CodigoFactura { get; set; } = string.Empty;
-        public int Id_Cliente { get; set; }
+        public int? Id_Cliente { get; set; }
         public string? ClienteNombre { get; set; } // Para JOIN
         public int Id_Sesion { get; set; }
         public string? CodigoSesion { get; set; } // Para JOIN
