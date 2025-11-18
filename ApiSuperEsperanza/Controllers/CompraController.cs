@@ -146,24 +146,67 @@ namespace SuperEsperanzaApi.Controlador
             // Asegurar que la fecha en el modelo también esté normalizada
             compra.FechaCompra = fechaNormalizada;
 
+            // Validar detalles antes de mapear
+            System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Validando {dto.Detalles.Count} detalles recibidos");
+            foreach (var det in dto.Detalles)
+            {
+                System.Diagnostics.Debug.WriteLine($"  Detalle recibido: Producto ID {det.Id_Producto}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}");
+                
+                if (det.Cantidad <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"La cantidad debe ser mayor a cero para el producto ID {det.Id_Producto}" });
+                }
+                
+                if (det.PrecioUnitario <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"El precio unitario debe ser mayor a cero para el producto ID {det.Id_Producto}" });
+                }
+                
+                if (det.Id_Producto <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"El ID de producto es inválido: {det.Id_Producto}" });
+                }
+            }
+
             // Mapear los detalles
             compra.Detalles = dto.Detalles.Select(d => new DetalleCompra
             {
                 Id_Producto = d.Id_Producto,
                 Cantidad = d.Cantidad,
                 PrecioUnitario = d.PrecioUnitario,
+                Subtotal = d.Cantidad * d.PrecioUnitario, // Calcular subtotal inmediatamente
                 Id_UsuarioCreacion = GetUserId()
             }).ToList();
 
-            var (ok, error, idCompra) = await _service.CrearCompraAsync(compra);
-            if (!ok)
+            System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Detalles mapeados: {compra.Detalles.Count}");
+            foreach (var det in compra.Detalles)
             {
-                return BadRequest(new ErrorResponse { Error = error });
+                System.Diagnostics.Debug.WriteLine($"  Detalle mapeado: Producto ID {det.Id_Producto}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}, Subtotal {det.Subtotal}");
             }
 
-            compra.Id_Compra = idCompra ?? 0;
-            var dtoCreado = _mapper.Map<CompraDto>(compra);
-            return CreatedAtAction(nameof(Create), new { id = compra.Id_Compra }, dtoCreado);
+            try
+            {
+                var (ok, error, idCompra) = await _service.CrearCompraAsync(compra);
+                if (!ok)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Error del servicio: {error}");
+                    return BadRequest(new ErrorResponse { Error = error });
+                }
+
+                compra.Id_Compra = idCompra ?? 0;
+                var dtoCreado = _mapper.Map<CompraDto>(compra);
+                System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Compra creada exitosamente con ID: {compra.Id_Compra}");
+                return CreatedAtAction(nameof(Create), new { id = compra.Id_Compra }, dtoCreado);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Excepción capturada: {ex.GetType().Name} - {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[CompraController.Create] Excepción interna: {ex.InnerException.Message}");
+                }
+                return BadRequest(new ErrorResponse { Error = $"Error al procesar la compra: {ex.Message}" });
+            }
         }
     }
 }

@@ -619,15 +619,24 @@ namespace SuperEsperanzaFrontEnd.Vistas
 
                 lblEstado.Text = "Procesando venta...";
 
-                // Agrupar items del carrito por lote para evitar duplicados
+                // Agrupar items del carrito SOLO por lote (no por precio)
                 // Si hay múltiples items del mismo lote, sumar las cantidades
+                // Si hay diferentes precios para el mismo lote, calcular precio promedio ponderado
                 var detallesAgrupados = _carrito
-                    .GroupBy(i => new { i.Id_Lote, i.PrecioUnitario })
-                    .Select(g => new DetalleFacturaCreateDto
+                    .GroupBy(i => i.Id_Lote)
+                    .Select(g => 
                     {
-                        Id_Lote = g.Key.Id_Lote,
-                        Cantidad = g.Sum(i => i.Cantidad),
-                        PrecioUnitario = g.Key.PrecioUnitario
+                        var totalCantidad = g.Sum(i => i.Cantidad);
+                        var totalSubtotal = g.Sum(i => i.Subtotal);
+                        // Calcular precio promedio ponderado si hay múltiples precios para el mismo lote
+                        var precioPromedio = totalCantidad > 0 ? totalSubtotal / totalCantidad : g.First().PrecioUnitario;
+                        
+                        return new DetalleFacturaCreateDto
+                        {
+                            Id_Lote = g.Key,
+                            Cantidad = totalCantidad,
+                            PrecioUnitario = precioPromedio
+                        };
                     })
                     .ToList();
                 

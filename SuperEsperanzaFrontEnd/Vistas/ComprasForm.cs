@@ -58,23 +58,25 @@ namespace SuperEsperanzaFrontEnd.Vistas
 
         private string GenerarCodigoCompraUnico()
         {
-            var random = new Random();
-            var now = DateTime.Now;
+            // Usar Guid para obtener una semilla única basada en tiempo y hardware
+            // Combinar múltiples fuentes de aleatoriedad para garantizar unicidad
+            var random = new Random(Guid.NewGuid().GetHashCode() ^ Environment.TickCount);
             
-            // Formato de 10 caracteres: COM + DDMM + HH + R
-            // COM (3) + DDMM (4) + HH (2) + R (1) = 10 caracteres exactos
-            // DDMM = día y mes (2 dígitos cada uno)
-            // HH = hora (2 dígitos)
-            // R = 1 dígito aleatorio (0-9) para evitar colisiones en la misma hora
+            // Caracteres permitidos: números (0-9) y letras mayúsculas (A-Z)
+            const string caracteres = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             
-            var diaMes = $"{now.Day:00}{now.Month:00}"; // DDMM (4 caracteres)
-            var hora = $"{now.Hour:00}"; // HH (2 caracteres)
-            var aleatorio = random.Next(0, 10); // 1 dígito aleatorio (0-9)
+            // Generar código de 10 caracteres completamente aleatorio
+            // Prefijo "COM" (3 caracteres) + 7 caracteres aleatorios = 10 caracteres total
+            var codigo = new System.Text.StringBuilder(10);
+            codigo.Append("COM"); // Prefijo fijo (3 caracteres)
             
-            // Formato final: COM + DDMM + HH + R = 10 caracteres
-            var codigo = $"COM{diaMes}{hora}{aleatorio}";
+            // Generar 7 caracteres aleatorios alfanuméricos
+            for (int i = 0; i < 7; i++)
+            {
+                codigo.Append(caracteres[random.Next(caracteres.Length)]);
+            }
             
-            return codigo;
+            return codigo.ToString(); // Total: 10 caracteres (COM + 7 aleatorios)
         }
 
         private async Task CargarDatos()

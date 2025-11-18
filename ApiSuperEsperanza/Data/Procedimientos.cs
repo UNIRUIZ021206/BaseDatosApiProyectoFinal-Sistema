@@ -74,6 +74,9 @@
         
         // Reportes
         public const string SP_REPORTE_VENTAS = "sp_ReporteVentas";
+        public const string SP_TOP5_PRODUCTOS_MAS_VENDIDOS = "sp_Top5ProductosMasVendidos";
+        public const string SP_TOP5_CATEGORIAS_MAS_VENDIDAS = "sp_Top5CategoriasMasVendidas";
+        public const string SP_TOP5_PRODUCTOS_MAS_INGRESOS = "sp_Top5ProductosMasIngresos";
         
         // Lotes
         public const string SP_MARCAR_LOTES_VENCIDOS = "sp_MarcarLotesVencidos";

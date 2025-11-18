@@ -60,17 +60,34 @@ namespace SuperEsperanzaApi.Controlador
             foreach (var det in dto.Detalles)
             {
                 System.Diagnostics.Debug.WriteLine($"    Detalle recibido: Lote ID {det.Id_Lote}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}");
+                
+                // Validar cada detalle antes de procesar
+                if (det.Cantidad <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"La cantidad debe ser mayor a cero para el lote ID {det.Id_Lote}" });
+                }
+                
+                if (det.PrecioUnitario <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"El precio unitario debe ser mayor a cero para el lote ID {det.Id_Lote}" });
+                }
+                
+                if (det.Id_Lote <= 0)
+                {
+                    return BadRequest(new ErrorResponse { Error = $"El ID de lote es inválido: {det.Id_Lote}" });
+                }
             }
 
             var factura = _mapper.Map<Factura>(dto);
             factura.Id_UsuarioCreacion = userId;
 
-            // Mapear los detalles
+            // Mapear los detalles y calcular subtotal
             factura.Detalles = dto.Detalles.Select(d => new DetalleFactura
             {
                 Id_Lote = d.Id_Lote,
                 Cantidad = d.Cantidad,
                 PrecioUnitario = d.PrecioUnitario,
+                Subtotal = d.Cantidad * d.PrecioUnitario, // Calcular subtotal inmediatamente
                 Id_UsuarioCreacion = userId
             }).ToList();
 
@@ -80,15 +97,29 @@ namespace SuperEsperanzaApi.Controlador
                 System.Diagnostics.Debug.WriteLine($"    Detalle mapeado: Lote ID {det.Id_Lote}, Cantidad {det.Cantidad}, Precio {det.PrecioUnitario}, Usuario {det.Id_UsuarioCreacion}");
             }
 
-            var (ok, error, idFactura) = await _service.CrearFacturaAsync(factura);
-            if (!ok)
+            try
             {
-                return BadRequest(new ErrorResponse { Error = error });
-            }
+                var (ok, error, idFactura) = await _service.CrearFacturaAsync(factura);
+                if (!ok)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Error del servicio: {error}");
+                    return BadRequest(new ErrorResponse { Error = error });
+                }
 
-            factura.Id_Factura = idFactura ?? 0;
-            var dtoCreado = _mapper.Map<FacturaDto>(factura);
-            return CreatedAtAction(nameof(Create), new { id = factura.Id_Factura }, dtoCreado);
+                factura.Id_Factura = idFactura ?? 0;
+                var dtoCreado = _mapper.Map<FacturaDto>(factura);
+                System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Factura creada exitosamente con ID: {factura.Id_Factura}");
+                return CreatedAtAction(nameof(Create), new { id = factura.Id_Factura }, dtoCreado);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Excepción capturada: {ex.GetType().Name} - {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[FacturaController.Create] Excepción interna: {ex.InnerException.Message}");
+                }
+                return BadRequest(new ErrorResponse { Error = $"Error al procesar la factura: {ex.Message}" });
+            }
         }
 
         [HttpPost("anular")]
