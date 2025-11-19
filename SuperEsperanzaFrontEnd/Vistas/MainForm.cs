@@ -31,6 +31,8 @@ namespace SuperEsperanzaFrontEnd.Vistas
             btnCompras.Enabled = PermissionService.TieneAcceso("Compras");
             // El botón Facturas abre reportes de ventas, requiere permisos específicos
             btnFacturas.Enabled = PermissionService.PuedeVerReporteVentas();
+            // El botón Reportes abre reportes de ventas con gráficas, requiere permisos específicos
+            btnReportes.Enabled = PermissionService.PuedeVerReporteVentas();
             // El botón Lotes abre reportes de inventario, requiere permisos específicos
             btnLotes.Enabled = PermissionService.PuedeVerReporteInventario();
             btnSesiones.Enabled = PermissionService.TieneAcceso("Sesiones");
@@ -44,6 +46,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             if (!btnProveedores.Enabled) btnProveedores.BackColor = System.Drawing.Color.Gray;
             if (!btnCompras.Enabled) btnCompras.BackColor = System.Drawing.Color.Gray;
             if (!btnFacturas.Enabled) btnFacturas.BackColor = System.Drawing.Color.Gray;
+            if (!btnReportes.Enabled) btnReportes.BackColor = System.Drawing.Color.Gray;
             if (!btnLotes.Enabled) btnLotes.BackColor = System.Drawing.Color.Gray;
             if (!btnSesiones.Enabled) btnSesiones.BackColor = System.Drawing.Color.Gray;
             if (!btnUsuarios.Enabled) btnUsuarios.BackColor = System.Drawing.Color.Gray;
@@ -181,6 +184,23 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
 
             // Abrir formulario de reporte de ventas
+            using (var reporteForm = new ReporteVentasForm())
+            {
+                reporteForm.ShowDialog();
+            }
+        }
+
+        private void btnReportes_Click(object? sender, EventArgs e)
+        {
+            // Verificar permisos antes de abrir
+            if (!PermissionService.PuedeVerReporteVentas())
+            {
+                MessageBox.Show("No tiene permisos para ver reportes de ventas.\n\nSolo Administradores, Supervisores, Gerentes y Contadores pueden acceder a esta funcionalidad.",
+                    "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Abrir formulario de reporte de ventas con gráficas
             using (var reporteForm = new ReporteVentasForm())
             {
                 reporteForm.ShowDialog();

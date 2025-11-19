@@ -34,6 +34,7 @@
             btnUsuarios = new Button();
             btnSesiones = new Button();
             btnLotes = new Button();
+            btnReportes = new Button();
             btnFacturas = new Button();
             btnCompras = new Button();
             btnProveedores = new Button();
@@ -55,18 +56,19 @@
             // panelMenu
             // 
             panelMenu.BackColor = Color.FromArgb(38, 70, 83);
-            panelMenu.Controls.Add(btnCerrarSesion);
-            panelMenu.Controls.Add(btnRoles);
-            panelMenu.Controls.Add(btnUsuarios);
-            panelMenu.Controls.Add(btnSesiones);
-            panelMenu.Controls.Add(btnLotes);
-            panelMenu.Controls.Add(btnFacturas);
-            panelMenu.Controls.Add(btnCompras);
-            panelMenu.Controls.Add(btnProveedores);
-            panelMenu.Controls.Add(btnClientes);
-            panelMenu.Controls.Add(btnCategorias);
-            panelMenu.Controls.Add(btnProductos);
             panelMenu.Controls.Add(lblTituloMenu);
+            panelMenu.Controls.Add(btnProductos);
+            panelMenu.Controls.Add(btnCategorias);
+            panelMenu.Controls.Add(btnClientes);
+            panelMenu.Controls.Add(btnProveedores);
+            panelMenu.Controls.Add(btnCompras);
+            panelMenu.Controls.Add(btnReportes);
+            panelMenu.Controls.Add(btnFacturas);
+            panelMenu.Controls.Add(btnLotes);
+            panelMenu.Controls.Add(btnSesiones);
+            panelMenu.Controls.Add(btnUsuarios);
+            panelMenu.Controls.Add(btnRoles);
+            panelMenu.Controls.Add(btnCerrarSesion);
             panelMenu.Dock = DockStyle.Left;
             panelMenu.Location = new Point(0, 0);
             panelMenu.Margin = new Padding(3, 4, 3, 4);
@@ -80,7 +82,7 @@
             btnCerrarSesion.FlatStyle = FlatStyle.Flat;
             btnCerrarSesion.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnCerrarSesion.ForeColor = Color.White;
-            btnCerrarSesion.Location = new Point(11, 733);
+            btnCerrarSesion.Location = new Point(11, 776);
             btnCerrarSesion.Margin = new Padding(3, 4, 3, 4);
             btnCerrarSesion.Name = "btnCerrarSesion";
             btnCerrarSesion.Size = new Size(229, 53);
@@ -95,7 +97,7 @@
             btnRoles.FlatStyle = FlatStyle.Flat;
             btnRoles.Font = new Font("Segoe UI", 10F);
             btnRoles.ForeColor = Color.White;
-            btnRoles.Location = new Point(11, 640);
+            btnRoles.Location = new Point(11, 709);
             btnRoles.Margin = new Padding(3, 4, 3, 4);
             btnRoles.Name = "btnRoles";
             btnRoles.Size = new Size(229, 53);
@@ -110,7 +112,7 @@
             btnUsuarios.FlatStyle = FlatStyle.Flat;
             btnUsuarios.Font = new Font("Segoe UI", 10F);
             btnUsuarios.ForeColor = Color.White;
-            btnUsuarios.Location = new Point(11, 573);
+            btnUsuarios.Location = new Point(11, 642);
             btnUsuarios.Margin = new Padding(3, 4, 3, 4);
             btnUsuarios.Name = "btnUsuarios";
             btnUsuarios.Size = new Size(229, 53);
@@ -125,7 +127,7 @@
             btnSesiones.FlatStyle = FlatStyle.Flat;
             btnSesiones.Font = new Font("Segoe UI", 10F);
             btnSesiones.ForeColor = Color.White;
-            btnSesiones.Location = new Point(11, 507);
+            btnSesiones.Location = new Point(11, 575);
             btnSesiones.Margin = new Padding(3, 4, 3, 4);
             btnSesiones.Name = "btnSesiones";
             btnSesiones.Size = new Size(229, 53);
@@ -140,7 +142,7 @@
             btnLotes.FlatStyle = FlatStyle.Flat;
             btnLotes.Font = new Font("Segoe UI", 10F);
             btnLotes.ForeColor = Color.White;
-            btnLotes.Location = new Point(11, 440);
+            btnLotes.Location = new Point(11, 508);
             btnLotes.Margin = new Padding(3, 4, 3, 4);
             btnLotes.Name = "btnLotes";
             btnLotes.Size = new Size(229, 53);
@@ -149,13 +151,30 @@
             btnLotes.UseVisualStyleBackColor = false;
             btnLotes.Click += btnLotes_Click;
             // 
+            // btnReportes
+            // 
+            btnReportes.BackColor = Color.FromArgb(233, 196, 106);
+            btnReportes.FlatStyle = FlatStyle.Flat;
+            btnReportes.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnReportes.ForeColor = Color.FromArgb(38, 70, 83);
+            btnReportes.Location = new Point(11, 374);
+            btnReportes.Margin = new Padding(3, 4, 3, 4);
+            btnReportes.Name = "btnReportes";
+            btnReportes.Size = new Size(229, 53);
+            btnReportes.TabIndex = 12;
+            btnReportes.Text = "Reportes";
+            btnReportes.UseVisualStyleBackColor = false;
+            btnReportes.Visible = true;
+            btnReportes.Enabled = true;
+            btnReportes.Click += btnReportes_Click;
+            // 
             // btnFacturas
             // 
             btnFacturas.BackColor = Color.FromArgb(42, 157, 143);
             btnFacturas.FlatStyle = FlatStyle.Flat;
             btnFacturas.Font = new Font("Segoe UI", 10F);
             btnFacturas.ForeColor = Color.White;
-            btnFacturas.Location = new Point(11, 373);
+            btnFacturas.Location = new Point(11, 441);
             btnFacturas.Margin = new Padding(3, 4, 3, 4);
             btnFacturas.Name = "btnFacturas";
             btnFacturas.Size = new Size(229, 53);
@@ -200,7 +219,7 @@
             btnClientes.FlatStyle = FlatStyle.Flat;
             btnClientes.Font = new Font("Segoe UI", 10F);
             btnClientes.ForeColor = Color.White;
-            btnClientes.Location = new Point(11, 173);
+            btnClientes.Location = new Point(11, 174);
             btnClientes.Margin = new Padding(3, 4, 3, 4);
             btnClientes.Name = "btnClientes";
             btnClientes.Size = new Size(229, 53);
@@ -344,6 +363,7 @@
         private System.Windows.Forms.Button btnProveedores;
         private System.Windows.Forms.Button btnCompras;
         private System.Windows.Forms.Button btnFacturas;
+        private System.Windows.Forms.Button btnReportes;
         private System.Windows.Forms.Button btnLotes;
         private System.Windows.Forms.Button btnSesiones;
         private System.Windows.Forms.Button btnUsuarios;

@@ -1,4 +1,6 @@
 #nullable enable
+using ScottPlot.WinForms;
+
 namespace SuperEsperanzaFrontEnd.Vistas
 {
     partial class ReporteVentasForm
@@ -19,9 +21,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.panelSuperior = new System.Windows.Forms.Panel();
             this.lblTitulo = new System.Windows.Forms.Label();
             this.panelControles = new System.Windows.Forms.Panel();
-            this.lblFecha = new System.Windows.Forms.Label();
-            this.dtpFecha = new System.Windows.Forms.DateTimePicker();
+            this.btnExportarExcel = new System.Windows.Forms.Button();
             this.btnBuscar = new System.Windows.Forms.Button();
+            this.dtpFecha = new System.Windows.Forms.DateTimePicker();
+            this.lblFecha = new System.Windows.Forms.Label();
             this.panelResumen = new System.Windows.Forms.Panel();
             this.lblTotalProductosLabel = new System.Windows.Forms.Label();
             this.lblTotalProductos = new System.Windows.Forms.Label();
@@ -29,12 +32,18 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.lblTotalCantidad = new System.Windows.Forms.Label();
             this.lblTotalVentasLabel = new System.Windows.Forms.Label();
             this.lblTotalVentas = new System.Windows.Forms.Label();
+            this.panelGraficas = new System.Windows.Forms.Panel();
+            this.formsPlotCantidades = new ScottPlot.WinForms.FormsPlot();
+            this.formsPlotVentas = new ScottPlot.WinForms.FormsPlot();
+            this.panelTabla = new System.Windows.Forms.Panel();
             this.dgvReporte = new System.Windows.Forms.DataGridView();
             this.btnCerrar = new System.Windows.Forms.Button();
             this.lblEstado = new System.Windows.Forms.Label();
             this.panelSuperior.SuspendLayout();
             this.panelControles.SuspendLayout();
             this.panelResumen.SuspendLayout();
+            this.panelGraficas.SuspendLayout();
+            this.panelTabla.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvReporte)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,7 +54,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.panelSuperior.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelSuperior.Location = new System.Drawing.Point(0, 0);
             this.panelSuperior.Name = "panelSuperior";
-            this.panelSuperior.Size = new System.Drawing.Size(1000, 60);
+            this.panelSuperior.Size = new System.Drawing.Size(1400, 60);
             this.panelSuperior.TabIndex = 0;
             // 
             // lblTitulo
@@ -62,13 +71,14 @@ namespace SuperEsperanzaFrontEnd.Vistas
             // panelControles
             // 
             this.panelControles.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
+            this.panelControles.Controls.Add(this.btnExportarExcel);
             this.panelControles.Controls.Add(this.btnBuscar);
             this.panelControles.Controls.Add(this.dtpFecha);
             this.panelControles.Controls.Add(this.lblFecha);
             this.panelControles.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelControles.Location = new System.Drawing.Point(0, 60);
             this.panelControles.Name = "panelControles";
-            this.panelControles.Size = new System.Drawing.Size(1000, 60);
+            this.panelControles.Size = new System.Drawing.Size(1400, 60);
             this.panelControles.TabIndex = 1;
             // 
             // lblFecha
@@ -104,6 +114,21 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.btnBuscar.UseVisualStyleBackColor = false;
             this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click);
             // 
+            // btnExportarExcel
+            // 
+            this.btnExportarExcel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(233)))), ((int)(((byte)(196)))), ((int)(((byte)(106)))));
+            this.btnExportarExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExportarExcel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.btnExportarExcel.ForeColor = System.Drawing.Color.White;
+            this.btnExportarExcel.Location = new System.Drawing.Point(490, 18);
+            this.btnExportarExcel.Name = "btnExportarExcel";
+            this.btnExportarExcel.Size = new System.Drawing.Size(150, 30);
+            this.btnExportarExcel.TabIndex = 3;
+            this.btnExportarExcel.Text = "Exportar a Excel";
+            this.btnExportarExcel.UseVisualStyleBackColor = false;
+            this.btnExportarExcel.Enabled = false;
+            this.btnExportarExcel.Click += new System.EventHandler(this.btnExportarExcel_Click);
+            // 
             // panelResumen
             // 
             this.panelResumen.BackColor = System.Drawing.Color.White;
@@ -117,7 +142,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.panelResumen.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelResumen.Location = new System.Drawing.Point(0, 120);
             this.panelResumen.Name = "panelResumen";
-            this.panelResumen.Size = new System.Drawing.Size(1000, 60);
+            this.panelResumen.Size = new System.Drawing.Size(1400, 60);
             this.panelResumen.TabIndex = 2;
             // 
             // lblTotalVentasLabel
@@ -186,6 +211,43 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.lblTotalProductos.TabIndex = 5;
             this.lblTotalProductos.Text = "0";
             // 
+            // panelGraficas
+            // 
+            this.panelGraficas.BackColor = System.Drawing.Color.White;
+            this.panelGraficas.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelGraficas.Controls.Add(this.formsPlotCantidades);
+            this.panelGraficas.Controls.Add(this.formsPlotVentas);
+            this.panelGraficas.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelGraficas.Location = new System.Drawing.Point(0, 180);
+            this.panelGraficas.Name = "panelGraficas";
+            this.panelGraficas.Size = new System.Drawing.Size(1400, 350);
+            this.panelGraficas.TabIndex = 3;
+            // 
+            // formsPlotVentas
+            // 
+            this.formsPlotVentas.Dock = System.Windows.Forms.DockStyle.Left;
+            this.formsPlotVentas.Location = new System.Drawing.Point(0, 0);
+            this.formsPlotVentas.Name = "formsPlotVentas";
+            this.formsPlotVentas.Size = new System.Drawing.Size(700, 348);
+            this.formsPlotVentas.TabIndex = 0;
+            // 
+            // formsPlotCantidades
+            // 
+            this.formsPlotCantidades.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.formsPlotCantidades.Location = new System.Drawing.Point(700, 0);
+            this.formsPlotCantidades.Name = "formsPlotCantidades";
+            this.formsPlotCantidades.Size = new System.Drawing.Size(698, 348);
+            this.formsPlotCantidades.TabIndex = 1;
+            // 
+            // panelTabla
+            // 
+            this.panelTabla.Controls.Add(this.dgvReporte);
+            this.panelTabla.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelTabla.Location = new System.Drawing.Point(0, 530);
+            this.panelTabla.Name = "panelTabla";
+            this.panelTabla.Size = new System.Drawing.Size(1400, 270);
+            this.panelTabla.TabIndex = 4;
+            // 
             // dgvReporte
             // 
             this.dgvReporte.AllowUserToAddRows = false;
@@ -199,12 +261,12 @@ namespace SuperEsperanzaFrontEnd.Vistas
             new System.Windows.Forms.DataGridViewTextBoxColumn { Name = "Total", HeaderText = "Total Venta", ReadOnly = true }
             });
             this.dgvReporte.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvReporte.Location = new System.Drawing.Point(0, 180);
+            this.dgvReporte.Location = new System.Drawing.Point(0, 0);
             this.dgvReporte.Name = "dgvReporte";
             this.dgvReporte.ReadOnly = true;
             this.dgvReporte.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvReporte.Size = new System.Drawing.Size(1000, 450);
-            this.dgvReporte.TabIndex = 3;
+            this.dgvReporte.Size = new System.Drawing.Size(1400, 270);
+            this.dgvReporte.TabIndex = 0;
             // 
             // btnCerrar
             // 
@@ -212,10 +274,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.btnCerrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCerrar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnCerrar.ForeColor = System.Drawing.Color.White;
-            this.btnCerrar.Location = new System.Drawing.Point(850, 640);
+            this.btnCerrar.Location = new System.Drawing.Point(1250, 810);
             this.btnCerrar.Name = "btnCerrar";
             this.btnCerrar.Size = new System.Drawing.Size(120, 40);
-            this.btnCerrar.TabIndex = 4;
+            this.btnCerrar.TabIndex = 5;
             this.btnCerrar.Text = "Cerrar";
             this.btnCerrar.UseVisualStyleBackColor = false;
             this.btnCerrar.Click += new System.EventHandler(this.btnCerrar_Click);
@@ -225,10 +287,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.lblEstado.AutoSize = true;
             this.lblEstado.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lblEstado.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(38)))), ((int)(((byte)(70)))), ((int)(((byte)(83)))));
-            this.lblEstado.Location = new System.Drawing.Point(20, 650);
+            this.lblEstado.Location = new System.Drawing.Point(20, 820);
             this.lblEstado.Name = "lblEstado";
             this.lblEstado.Size = new System.Drawing.Size(42, 15);
-            this.lblEstado.TabIndex = 5;
+            this.lblEstado.TabIndex = 6;
             this.lblEstado.Text = "Listo";
             // 
             // ReporteVentasForm
@@ -236,10 +298,11 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(244)))), ((int)(((byte)(244)))));
-            this.ClientSize = new System.Drawing.Size(1000, 700);
+            this.ClientSize = new System.Drawing.Size(1400, 860);
             this.Controls.Add(this.lblEstado);
             this.Controls.Add(this.btnCerrar);
-            this.Controls.Add(this.dgvReporte);
+            this.Controls.Add(this.panelTabla);
+            this.Controls.Add(this.panelGraficas);
             this.Controls.Add(this.panelResumen);
             this.Controls.Add(this.panelControles);
             this.Controls.Add(this.panelSuperior);
@@ -255,6 +318,8 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.panelControles.PerformLayout();
             this.panelResumen.ResumeLayout(false);
             this.panelResumen.PerformLayout();
+            this.panelGraficas.ResumeLayout(false);
+            this.panelTabla.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvReporte)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -267,6 +332,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private System.Windows.Forms.Label lblFecha = null!;
         private System.Windows.Forms.DateTimePicker dtpFecha = null!;
         private System.Windows.Forms.Button btnBuscar = null!;
+        private System.Windows.Forms.Button btnExportarExcel = null!;
         private System.Windows.Forms.Panel panelResumen = null!;
         private System.Windows.Forms.Label lblTotalVentasLabel = null!;
         private System.Windows.Forms.Label lblTotalVentas = null!;
@@ -274,6 +340,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private System.Windows.Forms.Label lblTotalCantidad = null!;
         private System.Windows.Forms.Label lblTotalProductosLabel = null!;
         private System.Windows.Forms.Label lblTotalProductos = null!;
+        private System.Windows.Forms.Panel panelGraficas = null!;
+        private ScottPlot.WinForms.FormsPlot formsPlotVentas = null!;
+        private ScottPlot.WinForms.FormsPlot formsPlotCantidades = null!;
+        private System.Windows.Forms.Panel panelTabla = null!;
         private System.Windows.Forms.DataGridView dgvReporte = null!;
         private System.Windows.Forms.Button btnCerrar = null!;
         private System.Windows.Forms.Label lblEstado = null!;
