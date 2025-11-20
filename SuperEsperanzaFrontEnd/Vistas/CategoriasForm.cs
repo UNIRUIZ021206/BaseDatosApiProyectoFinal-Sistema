@@ -10,6 +10,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private readonly CategoriaRepository _categoriaRepo;
         private List<CategoriaDto> _categorias = new();
         private CategoriaDto? _categoriaSeleccionada;
+        private ErrorProvider errorProvider = new ErrorProvider();
 
         // Paleta de colores
         private static readonly System.Drawing.Color VerdePrincipal = System.Drawing.Color.FromArgb(42, 157, 143);
@@ -26,6 +27,104 @@ namespace SuperEsperanzaFrontEnd.Vistas
             
             // Aplicar estilos modernos a los DataGridViews
             DataGridViewHelper.AplicarEstiloModerno(dgvCategorias);
+            
+            // Configurar validaciones en tiempo real
+            ConfigurarValidaciones();
+        }
+        
+        private void ConfigurarValidaciones()
+        {
+            // Validar que nombres no acepten números
+            txtNombre.KeyPress += TxtNombre_KeyPress;
+            txtNombre.Validating += TxtNombre_Validating;
+            
+            // Validar código
+            txtCodigo.Validating += TxtCodigo_Validating;
+            
+            // Generar código automáticamente al limpiar formulario
+            txtCodigo.Enabled = false;
+        }
+        
+        private void TxtNombre_KeyPress(object? sender, KeyPressEventArgs e)
+        {
+            // Permitir teclas de control
+            if (char.IsControl(e.KeyChar))
+                return;
+            
+            // No permitir números
+            if (char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+                errorProvider.SetError(txtNombre, "Los nombres no pueden contener números.");
+                return;
+            }
+            
+            // Permitir letras, espacios, guiones y apóstrofes
+            if (!char.IsLetter(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '-' && e.KeyChar != '\'')
+            {
+                e.Handled = true;
+                errorProvider.SetError(txtNombre, "Solo se permiten letras, espacios, guiones y apóstrofes.");
+            }
+            else
+            {
+                errorProvider.SetError(txtNombre, "");
+            }
+        }
+        
+        private void TxtNombre_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                errorProvider.SetError(txtNombre, "El nombre es obligatorio.");
+                e.Cancel = true;
+            }
+            else if (txtNombre.Text.Trim().Length > 100)
+            {
+                errorProvider.SetError(txtNombre, "El nombre no puede exceder 100 caracteres.");
+                e.Cancel = true;
+            }
+            else if (txtNombre.Text.Any(char.IsDigit))
+            {
+                errorProvider.SetError(txtNombre, "El nombre no puede contener números.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtNombre, "");
+            }
+        }
+        
+        private void TxtCodigo_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                errorProvider.SetError(txtCodigo, "El código es obligatorio.");
+                e.Cancel = true;
+            }
+            else if (txtCodigo.Text.Trim().Length > 50)
+            {
+                errorProvider.SetError(txtCodigo, "El código no puede exceder 50 caracteres.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtCodigo, "");
+            }
+        }
+        
+        private string GenerarCodigoCategoria()
+        {
+            var random = new Random(Guid.NewGuid().GetHashCode() ^ Environment.TickCount);
+            const string caracteres = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var codigo = new System.Text.StringBuilder(10);
+            codigo.Append("CAT"); // Prefijo para categorías
+            
+            for (int i = 0; i < 7; i++)
+            {
+                codigo.Append(caracteres[random.Next(caracteres.Length)]);
+            }
+            
+            return codigo.ToString();
         }
 
         private async Task CargarCategorias()
@@ -76,12 +175,15 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private void LimpiarFormulario()
         {
             _categoriaSeleccionada = null;
-            txtCodigo.Text = "";
+            // Generar código automáticamente solo al crear nuevo
+            txtCodigo.Text = GenerarCodigoCategoria();
+            txtCodigo.Enabled = false; // Deshabilitar edición del código
             txtNombre.Text = "";
             txtDescripcion.Text = "";
             chkEstado.Checked = true;
             btnGuardar.Text = "Agregar";
             btnEliminar.Enabled = false;
+            errorProvider.Clear();
         }
 
         private void HabilitarControles(bool habilitar)
@@ -107,11 +209,13 @@ namespace SuperEsperanzaFrontEnd.Vistas
                 if (_categoriaSeleccionada != null)
                 {
                     txtCodigo.Text = _categoriaSeleccionada.CodigoCategoria;
+                    txtCodigo.Enabled = true; // Permitir edición al actualizar
                     txtNombre.Text = _categoriaSeleccionada.Nombre;
                     txtDescripcion.Text = _categoriaSeleccionada.Descripcion ?? "";
                     chkEstado.Checked = _categoriaSeleccionada.Estado;
                     btnGuardar.Text = "Actualizar";
                     btnEliminar.Enabled = PermissionService.PuedeEliminar("Categorias");
+                    errorProvider.Clear();
                 }
             }
         }

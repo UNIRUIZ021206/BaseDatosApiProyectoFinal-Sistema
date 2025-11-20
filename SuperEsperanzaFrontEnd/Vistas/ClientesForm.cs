@@ -10,6 +10,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private readonly ClienteRepository _clienteRepo;
         private List<ClienteDto> _clientes = new();
         private ClienteDto? _clienteSeleccionado;
+        private ErrorProvider errorProvider = new ErrorProvider();
 
         // Paleta de colores
         private static readonly System.Drawing.Color VerdePrincipal = System.Drawing.Color.FromArgb(42, 157, 143);
@@ -26,6 +27,260 @@ namespace SuperEsperanzaFrontEnd.Vistas
             
             // Aplicar estilos modernos a los DataGridViews
             DataGridViewHelper.AplicarEstiloModerno(dgvClientes);
+            
+            // Configurar validaciones en tiempo real
+            ConfigurarValidaciones();
+        }
+        
+        private void ConfigurarValidaciones()
+        {
+            // Validar que nombres y apellidos no acepten números
+            txtPNombre.KeyPress += TxtNombre_KeyPress;
+            txtSNombre.KeyPress += TxtNombre_KeyPress;
+            txtPApellido.KeyPress += TxtNombre_KeyPress;
+            txtSApellido.KeyPress += TxtNombre_KeyPress;
+            
+            txtPNombre.Validating += TxtPNombre_Validating;
+            txtSNombre.Validating += TxtSNombre_Validating;
+            txtPApellido.Validating += TxtPApellido_Validating;
+            txtSApellido.Validating += TxtSApellido_Validating;
+            
+            // Validar teléfono solo números
+            txtTelefono.KeyPress += TxtTelefono_KeyPress;
+            txtTelefono.Validating += TxtTelefono_Validating;
+            
+            // Validar email
+            txtEmail.Validating += TxtEmail_Validating;
+            
+            // Validar código
+            txtCodigo.Validating += TxtCodigo_Validating;
+            
+            // Generar código automáticamente al limpiar formulario
+            txtCodigo.Enabled = false;
+        }
+        
+        private void TxtNombre_KeyPress(object? sender, KeyPressEventArgs e)
+        {
+            // Permitir teclas de control
+            if (char.IsControl(e.KeyChar))
+                return;
+            
+            // No permitir números
+            if (char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+                errorProvider.SetError((Control)sender!, "Los nombres no pueden contener números.");
+                return;
+            }
+            
+            // Permitir letras, espacios, guiones y apóstrofes
+            if (!char.IsLetter(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '-' && e.KeyChar != '\'')
+            {
+                e.Handled = true;
+                errorProvider.SetError((Control)sender!, "Solo se permiten letras, espacios, guiones y apóstrofes.");
+            }
+            else
+            {
+                errorProvider.SetError((Control)sender!, "");
+            }
+        }
+        
+        private void TxtPNombre_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtPNombre.Text))
+            {
+                errorProvider.SetError(txtPNombre, "El primer nombre es obligatorio.");
+                e.Cancel = true;
+            }
+            else if (txtPNombre.Text.Trim().Length > 50)
+            {
+                errorProvider.SetError(txtPNombre, "El primer nombre no puede exceder 50 caracteres.");
+                e.Cancel = true;
+            }
+            else if (txtPNombre.Text.Any(char.IsDigit))
+            {
+                errorProvider.SetError(txtPNombre, "El primer nombre no puede contener números.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtPNombre, "");
+            }
+        }
+        
+        private void TxtSNombre_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtSNombre.Text))
+            {
+                if (txtSNombre.Text.Trim().Length > 50)
+                {
+                    errorProvider.SetError(txtSNombre, "El segundo nombre no puede exceder 50 caracteres.");
+                    e.Cancel = true;
+                }
+                else if (txtSNombre.Text.Any(char.IsDigit))
+                {
+                    errorProvider.SetError(txtSNombre, "El segundo nombre no puede contener números.");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    errorProvider.SetError(txtSNombre, "");
+                }
+            }
+            else
+            {
+                errorProvider.SetError(txtSNombre, "");
+            }
+        }
+        
+        private void TxtPApellido_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtPApellido.Text))
+            {
+                errorProvider.SetError(txtPApellido, "El primer apellido es obligatorio.");
+                e.Cancel = true;
+            }
+            else if (txtPApellido.Text.Trim().Length > 50)
+            {
+                errorProvider.SetError(txtPApellido, "El primer apellido no puede exceder 50 caracteres.");
+                e.Cancel = true;
+            }
+            else if (txtPApellido.Text.Any(char.IsDigit))
+            {
+                errorProvider.SetError(txtPApellido, "El primer apellido no puede contener números.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtPApellido, "");
+            }
+        }
+        
+        private void TxtSApellido_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtSApellido.Text))
+            {
+                if (txtSApellido.Text.Trim().Length > 50)
+                {
+                    errorProvider.SetError(txtSApellido, "El segundo apellido no puede exceder 50 caracteres.");
+                    e.Cancel = true;
+                }
+                else if (txtSApellido.Text.Any(char.IsDigit))
+                {
+                    errorProvider.SetError(txtSApellido, "El segundo apellido no puede contener números.");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    errorProvider.SetError(txtSApellido, "");
+                }
+            }
+            else
+            {
+                errorProvider.SetError(txtSApellido, "");
+            }
+        }
+        
+        private void TxtTelefono_KeyPress(object? sender, KeyPressEventArgs e)
+        {
+            // Permitir teclas de control
+            if (char.IsControl(e.KeyChar))
+                return;
+            
+            // Permitir solo números, espacios, guiones y paréntesis
+            if (!char.IsDigit(e.KeyChar) && e.KeyChar != ' ' && e.KeyChar != '-' && e.KeyChar != '(' && e.KeyChar != ')')
+            {
+                e.Handled = true;
+                errorProvider.SetError(txtTelefono, "El teléfono solo puede contener números, espacios, guiones y paréntesis.");
+            }
+            else
+            {
+                errorProvider.SetError(txtTelefono, "");
+            }
+        }
+        
+        private void TxtTelefono_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtTelefono.Text))
+            {
+                var telefonoLimpio = txtTelefono.Text.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+                if (!telefonoLimpio.All(char.IsDigit))
+                {
+                    errorProvider.SetError(txtTelefono, "El teléfono solo puede contener números, espacios, guiones y paréntesis.");
+                    e.Cancel = true;
+                }
+                else if (telefonoLimpio.Length < 8 || telefonoLimpio.Length > 15)
+                {
+                    errorProvider.SetError(txtTelefono, "El teléfono debe contener entre 8 y 15 dígitos.");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    errorProvider.SetError(txtTelefono, "");
+                }
+            }
+            else
+            {
+                errorProvider.SetError(txtTelefono, "");
+            }
+        }
+        
+        private void TxtEmail_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                if (txtEmail.Text.Trim().Length > 100)
+                {
+                    errorProvider.SetError(txtEmail, "El email no puede exceder 100 caracteres.");
+                    e.Cancel = true;
+                }
+                else if (!ValidarEmail(txtEmail.Text))
+                {
+                    errorProvider.SetError(txtEmail, "El formato del email no es válido.");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    errorProvider.SetError(txtEmail, "");
+                }
+            }
+            else
+            {
+                errorProvider.SetError(txtEmail, "");
+            }
+        }
+        
+        private void TxtCodigo_Validating(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                errorProvider.SetError(txtCodigo, "El código es obligatorio.");
+                e.Cancel = true;
+            }
+            else if (txtCodigo.Text.Trim().Length > 50)
+            {
+                errorProvider.SetError(txtCodigo, "El código no puede exceder 50 caracteres.");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtCodigo, "");
+            }
+        }
+        
+        private string GenerarCodigoCliente()
+        {
+            var random = new Random(Guid.NewGuid().GetHashCode() ^ Environment.TickCount);
+            const string caracteres = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var codigo = new System.Text.StringBuilder(10);
+            codigo.Append("CLI"); // Prefijo para clientes
+            
+            for (int i = 0; i < 7; i++)
+            {
+                codigo.Append(caracteres[random.Next(caracteres.Length)]);
+            }
+            
+            return codigo.ToString();
         }
 
         private async Task CargarClientes()
@@ -79,7 +334,9 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private void LimpiarFormulario()
         {
             _clienteSeleccionado = null;
-            txtCodigo.Text = "";
+            // Generar código automáticamente solo al crear nuevo
+            txtCodigo.Text = GenerarCodigoCliente();
+            txtCodigo.Enabled = false; // Deshabilitar edición del código
             txtPNombre.Text = "";
             txtSNombre.Text = "";
             txtPApellido.Text = "";
@@ -91,6 +348,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             chkEstado.Checked = true;
             btnGuardar.Text = "Agregar";
             btnEliminar.Enabled = false;
+            errorProvider.Clear();
         }
 
         private void HabilitarControles(bool habilitar)
@@ -122,6 +380,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
                 if (_clienteSeleccionado != null)
                 {
                     txtCodigo.Text = _clienteSeleccionado.CodigoCliente;
+                    txtCodigo.Enabled = true; // Permitir edición al actualizar
                     txtPNombre.Text = _clienteSeleccionado.P_Nombre;
                     txtSNombre.Text = _clienteSeleccionado.S_Nombre ?? "";
                     txtPApellido.Text = _clienteSeleccionado.P_Apellido;
@@ -132,6 +391,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
                     chkEstado.Checked = _clienteSeleccionado.Estado;
                     btnGuardar.Text = "Actualizar";
                     btnEliminar.Enabled = PermissionService.PuedeEliminar("Clientes");
+                    errorProvider.Clear();
                 }
             }
         }
