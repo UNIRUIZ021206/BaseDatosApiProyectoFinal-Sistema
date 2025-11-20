@@ -160,28 +160,104 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
         }
 
+        private bool ValidarCampos()
+        {
+            // Validar código
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("El código del producto es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            if (txtCodigo.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El código no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            // Validar nombre
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre del producto es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            if (txtNombre.Text.Trim().Length > 200)
+            {
+                MessageBox.Show("El nombre no puede exceder 200 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            // Validar categoría
+            if (cmbCategoria.SelectedIndex < 0 || cmbCategoria.SelectedItem == null)
+            {
+                MessageBox.Show("Debe seleccionar una categoría.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbCategoria.Focus();
+                return false;
+            }
+
+            // Validar precio
+            if (numPrecioVenta.Value <= 0)
+            {
+                MessageBox.Show("El precio de venta debe ser mayor a cero.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numPrecioVenta.Focus();
+                return false;
+            }
+
+            if (numPrecioVenta.Value > 999999.99m)
+            {
+                MessageBox.Show("El precio de venta no puede exceder 999,999.99.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numPrecioVenta.Focus();
+                return false;
+            }
+
+            // Validar stock
+            if (numStockActual.Value < 0)
+            {
+                MessageBox.Show("El stock no puede ser negativo.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numStockActual.Focus();
+                return false;
+            }
+
+            if (numStockActual.Value > 999999)
+            {
+                MessageBox.Show("El stock no puede exceder 999,999 unidades.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                numStockActual.Focus();
+                return false;
+            }
+
+            // Validar descripción (opcional pero con límite)
+            if (!string.IsNullOrWhiteSpace(txtDescripcion.Text) && txtDescripcion.Text.Trim().Length > 500)
+            {
+                MessageBox.Show("La descripción no puede exceder 500 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDescripcion.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private async void btnGuardar_Click(object? sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
+                // Validar todos los campos
+                if (!ValidarCampos())
                 {
-                    MessageBox.Show("El código y el nombre son obligatorios.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (cmbCategoria.SelectedIndex < 0 || cmbCategoria.SelectedItem == null)
-                {
-                    MessageBox.Show("Debe seleccionar una categoría.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (numPrecioVenta.Value <= 0)
-                {
-                    MessageBox.Show("El precio de venta debe ser mayor a cero.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 

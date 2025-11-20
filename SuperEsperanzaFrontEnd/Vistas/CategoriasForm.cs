@@ -116,14 +116,61 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
         }
 
+        private bool ValidarCampos()
+        {
+            // Validar código
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("El código de la categoría es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            if (txtCodigo.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El código no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            // Validar nombre
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre de la categoría es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            if (txtNombre.Text.Trim().Length > 100)
+            {
+                MessageBox.Show("El nombre no puede exceder 100 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            // Validar descripción (opcional pero con límite)
+            if (!string.IsNullOrWhiteSpace(txtDescripcion.Text) && txtDescripcion.Text.Trim().Length > 500)
+            {
+                MessageBox.Show("La descripción no puede exceder 500 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDescripcion.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private async void btnGuardar_Click(object? sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
+                // Validar todos los campos
+                if (!ValidarCampos())
                 {
-                    MessageBox.Show("El código y el nombre son obligatorios.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 

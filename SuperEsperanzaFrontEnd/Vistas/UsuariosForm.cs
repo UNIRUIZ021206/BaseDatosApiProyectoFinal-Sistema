@@ -168,30 +168,211 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
         }
 
+        private bool ValidarEmail(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return true; // Email es opcional
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool ValidarTelefono(string? telefono)
+        {
+            if (string.IsNullOrWhiteSpace(telefono))
+                return true; // Teléfono es opcional
+
+            // Validar que solo contenga números, espacios, guiones y paréntesis
+            var telefonoLimpio = telefono.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+            return telefonoLimpio.All(char.IsDigit) && telefonoLimpio.Length >= 8 && telefonoLimpio.Length <= 15;
+        }
+
+        private bool ValidarSoloLetras(string? texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return true;
+
+            // Permitir letras, espacios y algunos caracteres especiales comunes en nombres
+            return texto.All(c => char.IsLetter(c) || char.IsWhiteSpace(c) || c == '-' || c == '\'');
+        }
+
+        private bool ValidarCampos()
+        {
+            // Validar código
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("El código del usuario es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            if (txtCodigo.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El código no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            // Validar nombre
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            if (txtNombre.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El nombre no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            if (!ValidarSoloLetras(txtNombre.Text))
+            {
+                MessageBox.Show("El nombre solo puede contener letras, espacios y guiones.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return false;
+            }
+
+            // Validar apellido
+            if (string.IsNullOrWhiteSpace(txtApellido.Text))
+            {
+                MessageBox.Show("El apellido es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return false;
+            }
+
+            if (txtApellido.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El apellido no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return false;
+            }
+
+            if (!ValidarSoloLetras(txtApellido.Text))
+            {
+                MessageBox.Show("El apellido solo puede contener letras, espacios y guiones.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return false;
+            }
+
+            // Validar email
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                if (txtEmail.Text.Trim().Length > 100)
+                {
+                    MessageBox.Show("El email no puede exceder 100 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return false;
+                }
+
+                if (!ValidarEmail(txtEmail.Text))
+                {
+                    MessageBox.Show("El formato del email no es válido.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return false;
+                }
+            }
+
+            // Validar teléfono
+            if (!string.IsNullOrWhiteSpace(txtTelefono.Text))
+            {
+                if (!ValidarTelefono(txtTelefono.Text))
+                {
+                    MessageBox.Show("El teléfono debe contener entre 8 y 15 dígitos. Puede incluir espacios, guiones y paréntesis.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtTelefono.Focus();
+                    return false;
+                }
+            }
+
+            // Validar contraseña (solo al crear)
+            if (_usuarioSeleccionado == null)
+            {
+                if (string.IsNullOrWhiteSpace(txtClave.Text))
+                {
+                    MessageBox.Show("La contraseña es obligatoria al crear un usuario.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtClave.Focus();
+                    return false;
+                }
+
+                if (txtClave.Text.Length < 6)
+                {
+                    MessageBox.Show("La contraseña debe tener al menos 6 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtClave.Focus();
+                    return false;
+                }
+
+                if (txtClave.Text.Length > 100)
+                {
+                    MessageBox.Show("La contraseña no puede exceder 100 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtClave.Focus();
+                    return false;
+                }
+            }
+            else
+            {
+                // Al actualizar, si se proporciona contraseña, validar longitud
+                if (!string.IsNullOrWhiteSpace(txtClave.Text))
+                {
+                    if (txtClave.Text.Length < 6)
+                    {
+                        MessageBox.Show("La contraseña debe tener al menos 6 caracteres.", "Validación",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtClave.Focus();
+                        return false;
+                    }
+
+                    if (txtClave.Text.Length > 100)
+                    {
+                        MessageBox.Show("La contraseña no puede exceder 100 caracteres.", "Validación",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtClave.Focus();
+                        return false;
+                    }
+                }
+            }
+
+            // Validar rol
+            if (cmbRol.SelectedIndex < 0 || cmbRol.SelectedItem == null)
+            {
+                MessageBox.Show("Debe seleccionar un rol.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbRol.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private async void btnGuardar_Click(object? sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || 
-                    string.IsNullOrWhiteSpace(txtNombre.Text) || 
-                    string.IsNullOrWhiteSpace(txtApellido.Text))
+                // Validar todos los campos
+                if (!ValidarCampos())
                 {
-                    MessageBox.Show("El código, nombre y apellido son obligatorios.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (cmbRol.SelectedIndex < 0 || cmbRol.SelectedItem == null)
-                {
-                    MessageBox.Show("Debe seleccionar un rol.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (_usuarioSeleccionado == null && string.IsNullOrWhiteSpace(txtClave.Text))
-                {
-                    MessageBox.Show("La contraseña es obligatoria al crear un usuario.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 

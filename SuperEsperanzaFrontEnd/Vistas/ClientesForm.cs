@@ -136,16 +136,201 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
         }
 
+        private bool ValidarEmail(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return true; // Email es opcional
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool ValidarTelefono(string? telefono)
+        {
+            if (string.IsNullOrWhiteSpace(telefono))
+                return true; // Teléfono es opcional
+
+            // Validar que solo contenga números, espacios, guiones y paréntesis
+            var telefonoLimpio = telefono.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+            return telefonoLimpio.All(char.IsDigit) && telefonoLimpio.Length >= 8 && telefonoLimpio.Length <= 15;
+        }
+
+        private bool ValidarSoloLetras(string? texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+                return true;
+
+            // Permitir letras, espacios y algunos caracteres especiales comunes en nombres
+            return texto.All(c => char.IsLetter(c) || char.IsWhiteSpace(c) || c == '-' || c == '\'');
+        }
+
+        private bool ValidarCampos()
+        {
+            // Validar código
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+            {
+                MessageBox.Show("El código del cliente es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            if (txtCodigo.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El código no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigo.Focus();
+                return false;
+            }
+
+            // Validar primer nombre
+            if (string.IsNullOrWhiteSpace(txtPNombre.Text))
+            {
+                MessageBox.Show("El primer nombre es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPNombre.Focus();
+                return false;
+            }
+
+            if (txtPNombre.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El primer nombre no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPNombre.Focus();
+                return false;
+            }
+
+            if (!ValidarSoloLetras(txtPNombre.Text))
+            {
+                MessageBox.Show("El primer nombre solo puede contener letras, espacios y guiones.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPNombre.Focus();
+                return false;
+            }
+
+            // Validar segundo nombre (opcional)
+            if (!string.IsNullOrWhiteSpace(txtSNombre.Text))
+            {
+                if (txtSNombre.Text.Trim().Length > 50)
+                {
+                    MessageBox.Show("El segundo nombre no puede exceder 50 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSNombre.Focus();
+                    return false;
+                }
+
+                if (!ValidarSoloLetras(txtSNombre.Text))
+                {
+                    MessageBox.Show("El segundo nombre solo puede contener letras, espacios y guiones.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSNombre.Focus();
+                    return false;
+                }
+            }
+
+            // Validar primer apellido
+            if (string.IsNullOrWhiteSpace(txtPApellido.Text))
+            {
+                MessageBox.Show("El primer apellido es obligatorio.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPApellido.Focus();
+                return false;
+            }
+
+            if (txtPApellido.Text.Trim().Length > 50)
+            {
+                MessageBox.Show("El primer apellido no puede exceder 50 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPApellido.Focus();
+                return false;
+            }
+
+            if (!ValidarSoloLetras(txtPApellido.Text))
+            {
+                MessageBox.Show("El primer apellido solo puede contener letras, espacios y guiones.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPApellido.Focus();
+                return false;
+            }
+
+            // Validar segundo apellido (opcional)
+            if (!string.IsNullOrWhiteSpace(txtSApellido.Text))
+            {
+                if (txtSApellido.Text.Trim().Length > 50)
+                {
+                    MessageBox.Show("El segundo apellido no puede exceder 50 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSApellido.Focus();
+                    return false;
+                }
+
+                if (!ValidarSoloLetras(txtSApellido.Text))
+                {
+                    MessageBox.Show("El segundo apellido solo puede contener letras, espacios y guiones.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtSApellido.Focus();
+                    return false;
+                }
+            }
+
+            // Validar teléfono
+            if (!string.IsNullOrWhiteSpace(txtTelefono.Text))
+            {
+                if (!ValidarTelefono(txtTelefono.Text))
+                {
+                    MessageBox.Show("El teléfono debe contener entre 8 y 15 dígitos. Puede incluir espacios, guiones y paréntesis.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtTelefono.Focus();
+                    return false;
+                }
+            }
+
+            // Validar email
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                if (txtEmail.Text.Trim().Length > 100)
+                {
+                    MessageBox.Show("El email no puede exceder 100 caracteres.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return false;
+                }
+
+                if (!ValidarEmail(txtEmail.Text))
+                {
+                    MessageBox.Show("El formato del email no es válido.", "Validación",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return false;
+                }
+            }
+
+            // Validar dirección (opcional)
+            if (!string.IsNullOrWhiteSpace(txtDireccion.Text) && txtDireccion.Text.Trim().Length > 200)
+            {
+                MessageBox.Show("La dirección no puede exceder 200 caracteres.", "Validación",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDireccion.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private async void btnGuardar_Click(object? sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(txtCodigo.Text) || 
-                    string.IsNullOrWhiteSpace(txtPNombre.Text) || 
-                    string.IsNullOrWhiteSpace(txtPApellido.Text))
+                // Validar todos los campos
+                if (!ValidarCampos())
                 {
-                    MessageBox.Show("El código, primer nombre y primer apellido son obligatorios.", "Validación",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
