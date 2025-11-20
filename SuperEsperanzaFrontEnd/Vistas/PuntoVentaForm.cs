@@ -64,6 +64,17 @@ namespace SuperEsperanzaFrontEnd.Vistas
         public PuntoVentaForm()
         {
             InitializeComponent();
+            
+            // Validar permisos de seguridad antes de continuar
+            if (!PermissionService.PuedeUsarPuntoVenta())
+            {
+                MessageBox.Show("No tiene permisos para usar el Punto de Venta.\n\nSolo Administradores y Cajeros pueden acceder a esta funcionalidad.",
+                    "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                this.DialogResult = DialogResult.Cancel;
+                this.Close();
+                return;
+            }
+            
             _productoRepo = new ProductoRepository();
             _clienteRepo = new ClienteRepository();
             _loteRepo = new LoteRepository();

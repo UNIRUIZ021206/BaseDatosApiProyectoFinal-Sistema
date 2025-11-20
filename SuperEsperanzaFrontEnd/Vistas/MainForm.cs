@@ -23,14 +23,14 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private void AplicarPermisos()
         {
             // Aplicar permisos según el rol del usuario
-            // El botón Productos abre el Punto de Venta, así que verifica ambos permisos
-            btnProductos.Enabled = PermissionService.TieneAcceso("Productos") && PermissionService.PuedeUsarPuntoVenta();
+            // El botón Productos abre la gestión de productos
+            btnProductos.Enabled = PermissionService.TieneAcceso("Productos");
             btnCategorias.Enabled = PermissionService.TieneAcceso("Categorias");
             btnClientes.Enabled = PermissionService.TieneAcceso("Clientes");
             btnProveedores.Enabled = PermissionService.TieneAcceso("Proveedores");
             btnCompras.Enabled = PermissionService.TieneAcceso("Compras");
-            // El botón Facturas abre reportes de ventas, requiere permisos específicos
-            btnFacturas.Enabled = PermissionService.PuedeVerReporteVentas();
+            // El botón Facturas abre el Punto de Venta para facturar
+            btnFacturas.Enabled = PermissionService.PuedeUsarPuntoVenta();
             // El botón Reportes abre reportes de ventas con gráficas, requiere permisos específicos
             btnReportes.Enabled = PermissionService.PuedeVerReporteVentas();
             // El botón Lotes abre reportes de inventario, requiere permisos específicos
@@ -115,28 +115,52 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private void btnProductos_Click(object? sender, EventArgs e)
         {
             // Verificar permisos antes de abrir
-            if (!PermissionService.PuedeUsarPuntoVenta())
+            if (!PermissionService.TieneAcceso("Productos"))
             {
-                MessageBox.Show("No tiene permisos para usar el Punto de Venta.\n\nSolo Administradores y Cajeros pueden acceder a esta funcionalidad.",
+                MessageBox.Show("No tiene permisos para acceder a Productos.",
                     "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Abrir Punto de Venta (POS)
-            using (var posForm = new PuntoVentaForm())
+            // Abrir formulario de gestión de productos
+            using (var productosForm = new ProductosForm())
             {
-                posForm.ShowDialog();
+                productosForm.ShowDialog();
             }
         }
 
         private void btnCategorias_Click(object? sender, EventArgs e)
         {
-            MostrarMensaje("Módulo de Categorías - Próximamente");
+            // Verificar permisos antes de abrir
+            if (!PermissionService.TieneAcceso("Categorias"))
+            {
+                MessageBox.Show("No tiene permisos para acceder a Categorías.",
+                    "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Abrir formulario de categorías
+            using (var categoriasForm = new CategoriasForm())
+            {
+                categoriasForm.ShowDialog();
+            }
         }
 
         private void btnClientes_Click(object? sender, EventArgs e)
         {
-            MostrarMensaje("Módulo de Clientes - Próximamente");
+            // Verificar permisos antes de abrir
+            if (!PermissionService.TieneAcceso("Clientes"))
+            {
+                MessageBox.Show("No tiene permisos para acceder a Clientes.",
+                    "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Abrir formulario de clientes
+            using (var clientesForm = new ClientesForm())
+            {
+                clientesForm.ShowDialog();
+            }
         }
 
         private void btnProveedores_Click(object? sender, EventArgs e)
@@ -176,17 +200,17 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private void btnFacturas_Click(object? sender, EventArgs e)
         {
             // Verificar permisos antes de abrir
-            if (!PermissionService.PuedeVerReporteVentas())
+            if (!PermissionService.PuedeUsarPuntoVenta())
             {
-                MessageBox.Show("No tiene permisos para ver reportes de ventas.\n\nSolo Administradores, Supervisores, Gerentes y Contadores pueden acceder a esta funcionalidad.",
+                MessageBox.Show("No tiene permisos para usar el Punto de Venta.\n\nSolo Administradores y Cajeros pueden acceder a esta funcionalidad.",
                     "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Abrir formulario de reporte de ventas
-            using (var reporteForm = new ReporteVentasForm())
+            // Abrir formulario de punto de venta para facturar
+            using (var puntoVentaForm = new PuntoVentaForm())
             {
-                reporteForm.ShowDialog();
+                puntoVentaForm.ShowDialog();
             }
         }
 
@@ -243,7 +267,19 @@ namespace SuperEsperanzaFrontEnd.Vistas
 
         private void btnUsuarios_Click(object? sender, EventArgs e)
         {
-            MostrarMensaje("Módulo de Usuarios - Próximamente");
+            // Verificar permisos antes de abrir
+            if (!PermissionService.TieneAcceso("Usuarios"))
+            {
+                MessageBox.Show("No tiene permisos para acceder a Usuarios.",
+                    "Acceso Denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Abrir formulario de usuarios
+            using (var usuariosForm = new UsuariosForm())
+            {
+                usuariosForm.ShowDialog();
+            }
         }
 
         private void btnRoles_Click(object? sender, EventArgs e)
