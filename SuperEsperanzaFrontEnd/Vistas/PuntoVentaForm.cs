@@ -201,6 +201,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             txtBuscar.Enabled = habilitar;
             btnBuscar.Enabled = habilitar;
             cmbCliente.Enabled = habilitar;
+            btnActualizarItem.Enabled = habilitar;
             btnEliminarItem.Enabled = habilitar;
             btnLimpiarCarrito.Enabled = habilitar;
             btnFinalizarVenta.Enabled = habilitar;
@@ -505,18 +506,186 @@ namespace SuperEsperanzaFrontEnd.Vistas
             }
         }
 
+        private async void btnActualizarItem_Click(object? sender, EventArgs e)
+        {
+            if (dgvCarrito.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Por favor, seleccione un item del carrito para actualizar.", "Selección Requerida",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var index = dgvCarrito.SelectedRows[0].Index;
+            if (index < 0 || index >= _carrito.Count)
+            {
+                MessageBox.Show("Item no válido.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var item = _carrito[index];
+            
+            try
+            {
+                // Obtener el producto para validar stock
+                var producto = _productos.FirstOrDefault(p => p.Id_Producto == item.Id_Producto);
+                if (producto == null)
+                {
+                    MessageBox.Show("Producto no encontrado.", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Obtener lotes disponibles para calcular stock máximo
+                var lotes = await _loteRepo.GetLotesDisponiblesPorProductoAsync(producto.Id_Producto);
+                var lotesOrdenados = lotes
+                    .OrderBy(l => l.FechaVencimiento ?? DateTime.MaxValue)
+                    .ThenByDescending(l => l.Cantidad)
+                    .ToList();
+
+                // Calcular stock disponible considerando lo que ya está en el carrito (excepto este item)
+                var cantidadEnCarritoOtrosItems = _carrito
+                    .Where((c, i) => i != index && c.Id_Producto == producto.Id_Producto)
+                    .Sum(c => c.Cantidad);
+                
+                var stockDisponible = lotesOrdenados.Sum(l => l.Cantidad) - cantidadEnCarritoOtrosItems;
+                var stockMaximo = Math.Min(producto.StockActual - cantidadEnCarritoOtrosItems, stockDisponible);
+
+                if (stockMaximo <= 0)
+                {
+                    MessageBox.Show("No hay stock disponible para este producto.", "Sin Stock",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Formulario para actualizar cantidad
+                using var formCantidad = new Form
+                {
+                    Text = $"Actualizar {item.NombreProducto}",
+                    Size = new System.Drawing.Size(350, 180),
+                    StartPosition = FormStartPosition.CenterParent,
+                    FormBorderStyle = FormBorderStyle.FixedDialog,
+                    MaximizeBox = false,
+                    MinimizeBox = false
+                };
+
+                var lblProducto = new Label 
+                { 
+                    Text = $"Producto: {item.NombreProducto}\nPrecio: {item.PrecioUnitario:C}\nStock disponible: {stockMaximo}",
+                    Location = new System.Drawing.Point(20, 10),
+                    AutoSize = true,
+                    Font = new System.Drawing.Font("Segoe UI", 9F)
+                };
+                
+                var lblCantidad = new Label 
+                { 
+                    Text = "Nueva Cantidad:", 
+                    Location = new System.Drawing.Point(20, 80), 
+                    AutoSize = true 
+                };
+                
+                var numCantidad = new NumericUpDown
+                {
+                    Location = new System.Drawing.Point(20, 100),
+                    Width = 300,
+                    Minimum = 1,
+                    Maximum = stockMaximo,
+                    Value = item.Cantidad
+                };
+                
+                var btnAceptar = new Button
+                {
+                    Text = "Actualizar",
+                    Location = new System.Drawing.Point(20, 130),
+                    Width = 140,
+                    DialogResult = DialogResult.OK,
+                    BackColor = VerdePrincipal,
+                    ForeColor = System.Drawing.Color.White,
+                    FlatStyle = System.Windows.Forms.FlatStyle.Flat
+                };
+                
+                var btnCancelar = new Button
+                {
+                    Text = "Cancelar",
+                    Location = new System.Drawing.Point(170, 130),
+                    Width = 140,
+                    DialogResult = DialogResult.Cancel,
+                    BackColor = Alerta,
+                    ForeColor = System.Drawing.Color.White,
+                    FlatStyle = System.Windows.Forms.FlatStyle.Flat
+                };
+
+                formCantidad.Controls.AddRange(new Control[] { lblProducto, lblCantidad, numCantidad, btnAceptar, btnCancelar });
+                formCantidad.AcceptButton = btnAceptar;
+                formCantidad.CancelButton = btnCancelar;
+
+                if (formCantidad.ShowDialog() == DialogResult.OK)
+                {
+                    var nuevaCantidad = (int)numCantidad.Value;
+                    
+                    if (nuevaCantidad <= 0 || nuevaCantidad > stockMaximo)
+                    {
+                        MessageBox.Show($"La cantidad debe estar entre 1 y {stockMaximo}.", "Cantidad Inválida",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Actualizar cantidad del item
+                    item.Cantidad = nuevaCantidad;
+                    
+                    ActualizarCarrito();
+                    ActualizarGridProductos();
+                    lblEstado.Text = $"Item actualizado: {item.NombreProducto} x{nuevaCantidad}";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al actualizar item: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                lblEstado.Text = "Listo";
+            }
+        }
+
+        private void dgvCarrito_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+        {
+            // Permitir actualizar con doble clic
+            if (e.RowIndex >= 0)
+            {
+                btnActualizarItem_Click(sender, e);
+            }
+        }
+
         private void btnEliminarItem_Click(object? sender, EventArgs e)
         {
-            if (dgvCarrito.SelectedRows.Count > 0)
+            if (dgvCarrito.SelectedRows.Count == 0)
             {
-                var index = dgvCarrito.SelectedRows[0].Index;
-                if (index < _carrito.Count)
-                {
-                    _carrito.RemoveAt(index);
-                    ActualizarCarrito();
-                    // Actualizar el grid de productos para reflejar el stock disponible actualizado
-                    ActualizarGridProductos();
-                }
+                MessageBox.Show("Por favor, seleccione un item del carrito para eliminar.", "Selección Requerida",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var index = dgvCarrito.SelectedRows[0].Index;
+            if (index < 0 || index >= _carrito.Count)
+            {
+                MessageBox.Show("Item no válido.", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var item = _carrito[index];
+            
+            var resultado = MessageBox.Show(
+                $"¿Está seguro que desea eliminar '{item.NombreProducto}' (Cantidad: {item.Cantidad}) del carrito?",
+                "Confirmar Eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (resultado == DialogResult.Yes)
+            {
+                _carrito.RemoveAt(index);
+                ActualizarCarrito();
+                ActualizarGridProductos();
+                lblEstado.Text = "Item eliminado del carrito";
             }
         }
 

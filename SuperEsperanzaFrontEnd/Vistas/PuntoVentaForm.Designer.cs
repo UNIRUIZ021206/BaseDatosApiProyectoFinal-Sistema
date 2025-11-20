@@ -29,6 +29,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.cmbCliente = new System.Windows.Forms.ComboBox();
             this.lblCarrito = new System.Windows.Forms.Label();
             this.dgvCarrito = new System.Windows.Forms.DataGridView();
+            this.btnActualizarItem = new System.Windows.Forms.Button();
             this.btnEliminarItem = new System.Windows.Forms.Button();
             this.btnLimpiarCarrito = new System.Windows.Forms.Button();
             this.panelTotales = new System.Windows.Forms.Panel();
@@ -162,6 +163,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.panelDerecho.Controls.Add(this.panelTotales);
             this.panelDerecho.Controls.Add(this.btnLimpiarCarrito);
             this.panelDerecho.Controls.Add(this.btnEliminarItem);
+            this.panelDerecho.Controls.Add(this.btnActualizarItem);
             this.panelDerecho.Controls.Add(this.dgvCarrito);
             this.panelDerecho.Controls.Add(this.lblCarrito);
             this.panelDerecho.Controls.Add(this.cmbCliente);
@@ -225,6 +227,21 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.dgvCarrito.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvCarrito.Size = new System.Drawing.Size(660, 250);
             this.dgvCarrito.TabIndex = 3;
+            this.dgvCarrito.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCarrito_CellDoubleClick);
+            // 
+            // btnActualizarItem
+            // 
+            this.btnActualizarItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(157)))), ((int)(((byte)(143)))));
+            this.btnActualizarItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnActualizarItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnActualizarItem.ForeColor = System.Drawing.Color.White;
+            this.btnActualizarItem.Location = new System.Drawing.Point(20, 370);
+            this.btnActualizarItem.Name = "btnActualizarItem";
+            this.btnActualizarItem.Size = new System.Drawing.Size(120, 30);
+            this.btnActualizarItem.TabIndex = 4;
+            this.btnActualizarItem.Text = "Actualizar Item";
+            this.btnActualizarItem.UseVisualStyleBackColor = false;
+            this.btnActualizarItem.Click += new System.EventHandler(this.btnActualizarItem_Click);
             // 
             // btnEliminarItem
             // 
@@ -232,10 +249,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.btnEliminarItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEliminarItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnEliminarItem.ForeColor = System.Drawing.Color.White;
-            this.btnEliminarItem.Location = new System.Drawing.Point(20, 370);
+            this.btnEliminarItem.Location = new System.Drawing.Point(150, 370);
             this.btnEliminarItem.Name = "btnEliminarItem";
             this.btnEliminarItem.Size = new System.Drawing.Size(120, 30);
-            this.btnEliminarItem.TabIndex = 4;
+            this.btnEliminarItem.TabIndex = 5;
             this.btnEliminarItem.Text = "Eliminar Item";
             this.btnEliminarItem.UseVisualStyleBackColor = false;
             this.btnEliminarItem.Click += new System.EventHandler(this.btnEliminarItem_Click);
@@ -246,10 +263,10 @@ namespace SuperEsperanzaFrontEnd.Vistas
             this.btnLimpiarCarrito.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLimpiarCarrito.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.btnLimpiarCarrito.ForeColor = System.Drawing.Color.White;
-            this.btnLimpiarCarrito.Location = new System.Drawing.Point(150, 370);
+            this.btnLimpiarCarrito.Location = new System.Drawing.Point(280, 370);
             this.btnLimpiarCarrito.Name = "btnLimpiarCarrito";
             this.btnLimpiarCarrito.Size = new System.Drawing.Size(120, 30);
-            this.btnLimpiarCarrito.TabIndex = 5;
+            this.btnLimpiarCarrito.TabIndex = 6;
             this.btnLimpiarCarrito.Text = "Limpiar Carrito";
             this.btnLimpiarCarrito.UseVisualStyleBackColor = false;
             this.btnLimpiarCarrito.Click += new System.EventHandler(this.btnLimpiarCarrito_Click);
@@ -427,6 +444,7 @@ namespace SuperEsperanzaFrontEnd.Vistas
         private System.Windows.Forms.ComboBox cmbCliente = null!;
         private System.Windows.Forms.Label lblCarrito = null!;
         private System.Windows.Forms.DataGridView dgvCarrito = null!;
+        private System.Windows.Forms.Button btnActualizarItem = null!;
         private System.Windows.Forms.Button btnEliminarItem = null!;
         private System.Windows.Forms.Button btnLimpiarCarrito = null!;
         private System.Windows.Forms.Panel panelTotales = null!;
